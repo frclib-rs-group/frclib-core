@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.check.command": "clippy",
+    "rust-analyzer.cargo.features": ["full"],
+    "rust-analyzer.cargo.unsetTest": ["frclib-core"]
+}
