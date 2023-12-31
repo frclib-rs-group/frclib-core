@@ -1,22 +1,21 @@
 use crate::units::time::Second;
-use frclib_units_macros::{unit, unit_conversion, unit_dimensional_analysis};
+use crate::{unit, unit_conversion, unit_dim_analysis};
 
-unit!(Joule, f64);
-unit!(Volt, f64);
-unit!(Amp, f64);
-unit!(Watt, f64);
-unit!(WattHour, f64);
-unit!(Ohm, f64);
+unit!(Joule: float);
+unit!(Volt: float);
+unit!(Amp: float);
+unit!(Watt: float);
+unit!(WattHour: float);
+unit!(Ohm: float);
 
-unit_conversion!(Joule f64, WattHour f64, joule_to_watt_hour);
+unit_conversion!(Joule(float) <-> WattHour(float) ~ joule_to_watthour);
 
-fn joule_to_watt_hour(joule: f64) -> f64 {
+fn joule_to_watthour(joule: f64) -> f64 {
     joule / 3600.0
 }
 
-unit_dimensional_analysis!(Volt * Amp = Watt);
-
-unit_dimensional_analysis!(Watt * Second = Joule);
+unit_dim_analysis!(Volt * Ohm = Watt);
+unit_dim_analysis!(Watt * Second = Joule);
 
 impl Watt {
     #[must_use]

@@ -1,18 +1,18 @@
-use frclib_units_macros::{unit, unit_conversion};
+use crate::{unit, unit_conversion, unit_family};
 
-unit!(Kilogram, f64);
-unit!(Gram, f64);
-unit!(Pound, f64);
-unit!(Ounce, f64);
+unit!(Kilogram: float);
+unit!(Gram: float);
+unit!(Pound: float);
+unit!(Ounce: float);
 
-unit_conversion!(Kilogram f64, Gram f64, kilogram_to_gram);
-unit_conversion!(Kilogram f64, Pound f64, kilogram_to_pound);
-unit_conversion!(Kilogram f64, Ounce f64, kilogram_to_ounce);
-unit_conversion!(Gram f64, Pound f64, gram_to_pound);
-unit_conversion!(Gram f64, Ounce f64, gram_to_ounce);
-unit_conversion!(Pound f64, Ounce f64, pound_to_ounce);
+unit_conversion!(Kilogram(float) <-> Gram(float) ~ kilogram_to_gram);
+unit_conversion!(Kilogram(float) <-> Pound(float) ~ kilogram_to_pound);
+unit_conversion!(Kilogram(float) <-> Ounce(float) ~ kilogram_to_ounce);
+unit_conversion!(Gram(float) <-> Pound(float) ~ gram_to_pound);
+unit_conversion!(Gram(float) <-> Ounce(float) ~ gram_to_ounce);
+unit_conversion!(Pound(float) <-> Ounce(float) ~ pound_to_ounce);
 
-// unit_family!(Mass: Kilogram Gram Pound Ounce);
+unit_family!(Mass(Kilogram): Gram, Pound, Ounce);
 
 fn kilogram_to_gram(kilogram: f64) -> f64 {
     kilogram * 1000.0

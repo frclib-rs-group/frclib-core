@@ -8,16 +8,6 @@ unit!(Second: float);
 unit!(Millisecond: float);
 unit!(Microsecond: uint);
 
-// unit_conversion!(Second f64, Millisecond f64, second_to_millisecond);
-// unit_conversion!(Second f64, Microsecond u64, second_to_microsecond);
-// unit_conversion!(Millisecond f64, Microsecond u64, millisecond_to_microsecond);
-// unit_conversion!(Hour f64, Second f64, hour_to_second);
-// unit_conversion!(Minute f64, Second f64, minute_to_second);
-// unit_conversion!(Hour f64, Minute f64, hour_to_minute);
-// unit_conversion!(Minute f64, Millisecond f64, minute_to_millisecond);
-// unit_conversion!(Minute f64, Microsecond u64, minute_to_microsecond);
-// unit_conversion!(Hour f64, Millisecond f64, hour_to_millisecond);
-// unit_conversion!(Hour f64, Microsecond u64, hour_to_microsecond);
 unit_conversion!(Second(float) <-> Millisecond(float) ~ second_to_millisecond);
 unit_conversion!(Second(float) <-> Microsecond(uint) ~ second_to_microsecond);
 unit_conversion!(Millisecond(float) <-> Microsecond(uint) ~ millisecond_to_microsecond);
@@ -29,11 +19,11 @@ unit_conversion!(Minute(float) <-> Microsecond(uint) ~ minute_to_microsecond);
 unit_conversion!(Hour(float) <-> Millisecond(float) ~ hour_to_millisecond);
 unit_conversion!(Hour(float) <-> Microsecond(uint) ~ hour_to_microsecond);
 
-//This is a hack to satisfy unit family, will fix later
+//TODO: This is a hack to satisfy unit family
 impl Neg for Microsecond {
     type Output = Self;
     fn neg(self) -> Self::Output {
-        self
+        unimplemented!("Negation of Microsecond not implemented")
     }
 }
 

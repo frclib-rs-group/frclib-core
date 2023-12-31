@@ -1,20 +1,20 @@
 use crate::units::distance::{Feet, Meter};
 use crate::units::time::Second;
-use frclib_units_macros::{unit, unit_conversion};
+use crate::{unit, unit_conversion, unit_family};
 
-unit!(MeterPerSecond, f64);
-unit!(KilometerPerHour, f64);
-unit!(MilePerHour, f64);
-unit!(FeetPerSecond, f64);
+unit!(MeterPerSecond: float);
+unit!(KilometerPerHour: float);
+unit!(MilePerHour: float);
+unit!(FeetPerSecond: float);
 
-unit_conversion!(MeterPerSecond f64, KilometerPerHour f64, meter_per_second_to_kilometer_per_hour);
-unit_conversion!(MeterPerSecond f64, MilePerHour f64, meter_per_second_to_mile_per_hour);
-unit_conversion!(MeterPerSecond f64, FeetPerSecond f64, meter_per_second_to_feet_per_second);
-unit_conversion!(FeetPerSecond f64, MilePerHour f64, feet_per_second_to_mile_per_hour);
-unit_conversion!(FeetPerSecond f64, KilometerPerHour f64, feet_per_second_to_kilometer_per_hour);
-unit_conversion!(MilePerHour f64, KilometerPerHour f64, mile_per_hour_to_kilometer_per_hour);
+unit_conversion!(MeterPerSecond(float) <-> KilometerPerHour(float) ~ meter_per_second_to_kilometer_per_hour);
+unit_conversion!(MeterPerSecond(float) <-> MilePerHour(float) ~ meter_per_second_to_mile_per_hour);
+unit_conversion!(MeterPerSecond(float) <-> FeetPerSecond(float) ~ meter_per_second_to_feet_per_second);
+unit_conversion!(FeetPerSecond(float) <-> MilePerHour(float) ~ feet_per_second_to_mile_per_hour);
+unit_conversion!(FeetPerSecond(float) <-> KilometerPerHour(float) ~ feet_per_second_to_kilometer_per_hour);
+unit_conversion!(MilePerHour(float) <-> KilometerPerHour(float) ~ mile_per_hour_to_kilometer_per_hour);
 
-// unit_family!(LinearVelocity: MeterPerSecond KilometerPerHour MilePerHour FeetPerSecond);
+unit_family!(LinearVelocity(MeterPerSecond): KilometerPerHour, MilePerHour, FeetPerSecond);
 
 fn meter_per_second_to_kilometer_per_hour(meter_per_second: f64) -> f64 {
     meter_per_second * 3.6

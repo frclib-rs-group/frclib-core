@@ -129,5 +129,16 @@ fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
             }
         }
         frclib_core::structure::inventory::submit! { <#name as FrcStructure>::DESCRIPTION }
+        //this isnt a generic impl for every struct because of primitive and unit types
+        impl Into<frclib_core::value::FrcValue> for #name {
+            fn into(self) -> frclib_core::value::FrcValue {
+                let mut buffer = frclib_core::structure::bytes::BytesMut::with_capacity(Self::SIZE);
+                self.pack(&mut buffer);
+                frclib_core::value::FrcValue::Struct(
+                    &Self::DESCRIPTION,
+                    Box::new(buffer.freeze())
+                )
+            }
+        }
     }
 }

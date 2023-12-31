@@ -1,18 +1,18 @@
-use frclib_units_macros::{unit, unit_conversion};
+use crate::{unit_family, unit, unit_conversion};
 
-unit!(DegreePerSecond, f64);
-unit!(RadianPerSecond, f64);
-unit!(RotationPerSecond, f64);
-unit!(RotationPerMinute, f64);
+unit!(DegreePerSecond: float);
+unit!(RadianPerSecond: float);
+unit!(RotationPerSecond: float);
+unit!(RotationPerMinute: float);
 
-unit_conversion!(DegreePerSecond f64, RadianPerSecond f64, degree_per_second_to_radian_per_second);
-unit_conversion!(DegreePerSecond f64, RotationPerSecond f64, degree_per_second_to_rotation_per_second);
-unit_conversion!(DegreePerSecond f64, RotationPerMinute f64, degree_per_second_to_rotation_per_minute);
-unit_conversion!(RadianPerSecond f64, RotationPerSecond f64, radian_per_second_to_rotation_per_second);
-unit_conversion!(RadianPerSecond f64, RotationPerMinute f64, radian_per_second_to_rotation_per_minute);
-unit_conversion!(RotationPerSecond f64, RotationPerMinute f64, rotation_per_second_to_rotation_per_minute);
+unit_conversion!(DegreePerSecond(float) <-> RadianPerSecond(float) ~ degree_per_second_to_radian_per_second);
+unit_conversion!(DegreePerSecond(float) <-> RotationPerSecond(float) ~ degree_per_second_to_rotation_per_second);
+unit_conversion!(DegreePerSecond(float) <-> RotationPerMinute(float) ~ degree_per_second_to_rotation_per_minute);
+unit_conversion!(RadianPerSecond(float) <-> RotationPerSecond(float) ~ radian_per_second_to_rotation_per_second);
+unit_conversion!(RadianPerSecond(float) <-> RotationPerMinute(float) ~ radian_per_second_to_rotation_per_minute);
+unit_conversion!(RotationPerSecond(float) <-> RotationPerMinute(float) ~ rotation_per_second_to_rotation_per_minute);
 
-// unit_family!(AngularVelo: DegreePerSecond RadianPerSecond RotationPerSecond RotationPerMinute);
+unit_family!(AngleVel(RadianPerSecond): DegreePerSecond, RotationPerSecond, RotationPerMinute);
 
 fn degree_per_second_to_radian_per_second(degree_per_second: f64) -> f64 {
     degree_per_second.to_radians()

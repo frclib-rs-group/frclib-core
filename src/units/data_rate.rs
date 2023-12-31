@@ -1,20 +1,20 @@
 use crate::units::data::{Byte, Gigabyte, Kilobyte, Megabyte};
 use crate::units::time::Second;
-use frclib_units_macros::{unit, unit_conversion};
+use crate::{unit, unit_conversion, unit_family};
 
-unit!(BytesPerSecond, f64);
-unit!(KilobytesPerSecond, f64);
-unit!(MegabytesPerSecond, f64);
-unit!(GigabytesPerHour, f64);
+unit!(BytesPerSecond: float);
+unit!(KilobytesPerSecond: float);
+unit!(MegabytesPerSecond: float);
+unit!(GigabytesPerHour: float);
 
-unit_conversion!(BytesPerSecond f64, KilobytesPerSecond f64, byte_per_second_to_kilobyte_per_second);
-unit_conversion!(BytesPerSecond f64, MegabytesPerSecond f64, byte_per_second_to_megabyte_per_second);
-unit_conversion!(BytesPerSecond f64, GigabytesPerHour f64, byte_per_second_to_gigabyte_per_hour);
-unit_conversion!(KilobytesPerSecond f64, MegabytesPerSecond f64, kilobyte_per_second_to_megabyte_per_second);
-unit_conversion!(KilobytesPerSecond f64, GigabytesPerHour f64, kilobyte_per_second_to_gigabyte_per_hour);
-unit_conversion!(MegabytesPerSecond f64, GigabytesPerHour f64, megabyte_per_second_to_gigabyte_per_hour);
+unit_conversion!(BytesPerSecond(float) <-> KilobytesPerSecond(float) ~ byte_per_second_to_kilobyte_per_second);
+unit_conversion!(BytesPerSecond(float) <-> MegabytesPerSecond(float) ~ byte_per_second_to_megabyte_per_second);
+unit_conversion!(BytesPerSecond(float) <-> GigabytesPerHour(float) ~ byte_per_second_to_gigabyte_per_hour);
+unit_conversion!(KilobytesPerSecond(float) <-> MegabytesPerSecond(float) ~ kilobyte_per_second_to_megabyte_per_second);
+unit_conversion!(KilobytesPerSecond(float) <-> GigabytesPerHour(float) ~ kilobyte_per_second_to_gigabyte_per_hour);
+unit_conversion!(MegabytesPerSecond(float) <-> GigabytesPerHour(float) ~ megabyte_per_second_to_gigabyte_per_hour);
 
-// unit_family!(DataRate: BytesPerSecond KilobytesPerSecond MegabytesPerSecond GigabytesPerHour);
+unit_family!(DataRate(BytesPerSecond): KilobytesPerSecond, MegabytesPerSecond, GigabytesPerHour);
 
 fn byte_per_second_to_kilobyte_per_second(byte_per_second: f64) -> f64 {
     byte_per_second / 1000.0
