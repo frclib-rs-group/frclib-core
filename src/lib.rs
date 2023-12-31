@@ -26,9 +26,22 @@
     asm_sub_register,
     break_with_label_and_loop,
     bindings_with_variant_name,
-    anonymous_parameters
+    anonymous_parameters,
+    clippy::unwrap_used,
+    clippy::panicking_unwrap
 )]
 #![allow(clippy::module_name_repetitions)]
+
+//The end goal is to have no panics in the library
+// #![cfg_attr(
+//     not(test),
+//     forbid(
+//         clippy::panic,
+//         clippy::todo,
+//         clippy::unimplemented,
+//         clippy::expect_used
+//     )
+// )]
 
 #[cfg(feature = "value-union")]
 pub mod value;

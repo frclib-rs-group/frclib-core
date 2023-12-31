@@ -88,6 +88,8 @@ pub mod __private {
         pub system_time_valid: fn() -> bool,
     }
 
+    ///This is called by the HAL to set the time implementation,
+    ///could be called in other places but is not recommended.
     pub unsafe fn set_time_implementation(time_imp: TimeImplementation) {
         use std::sync::atomic::Ordering;
         assert!(
