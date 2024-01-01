@@ -17,7 +17,7 @@ jobs:
       - name: Set toolchain
         run: |
           rustup set profile minimal
-          rustup override set stable
+          rustup override set 1.75.0
 
       - uses: Swatinem/rust-cache@v2.0.0
 
