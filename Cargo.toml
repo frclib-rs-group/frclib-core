@@ -32,10 +32,7 @@ nalgebra = { version = "0.32", optional = true}
 num = { version = "0.4", optional = true}
 simba = { version = "0.8", optional = true}
 ctor = { version = "0.2.5", optional = true}
-tracing = {version = "0.1.40", features = ["valuable"]}
 frclib-structure-macros = { path = "./frclib-structure-macros", optional = true}
-static_assertions = "1.1.0"
-parking_lot = "0.12.1"
 paste = { version = "1.0.14", optional = true }
 
 [dev-dependencies]
@@ -45,10 +42,12 @@ approx = "0.5.1"
 structure = ["bytes", "inventory", "logos", "frclib-structure-macros"]
 value-union = ["structure", "serde", "rmpv", "serde_json"]
 units = ["num", "nalgebra", "simba", "serde", "paste"]
-time = ["ctor", "units"]
-hal = ["time"]
+time = ["ctor"]
+hal = ["time", "units"]
 
+# approx 40 packages
 basic = ["value-union", "time"]
+# approx 71 packages and much longer compile times
 full = ["basic", "units", "hal"]
 
 

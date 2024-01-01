@@ -7,10 +7,12 @@ mod default;
 mod instant;
 
 use std::sync::atomic::{self, AtomicBool};
-use crate::units::time::Microsecond;
 
 pub use instant::Instant;
 pub use std::time::{Duration, SystemTime};
+
+/// We don't use the unit as not to depend on the units module when we don't need to
+type Microsecond = u64;
 
 static mut UPTIME_SOURCE: fn() -> Microsecond = default::default_uptime_source;
 static mut UPTIME_PAUSE: fn(bool) = default::default_uptime_pause;
@@ -27,7 +29,7 @@ static TIME_IMPL_FROZEN: atomic::AtomicBool = atomic::AtomicBool::new(false);
 #[inline]
 pub fn uptime() -> Duration {
     TIME_IMPL_FROZEN.store(true, atomic::Ordering::Relaxed);
-    unsafe { UPTIME_SOURCE() }.into()
+    Duration::from_micros(unsafe { UPTIME_SOURCE() })
 }
 
 #[allow(missing_docs)]
@@ -89,13 +91,12 @@ pub fn system_time() -> Option<SystemTime> {
 
 #[doc(hidden)]
 pub mod __private {
-    use crate::units::time::Microsecond;
 
     #[derive(Debug, Clone, Copy)]
     pub struct TimeImplementation {
         pub implementation_name: &'static str,
         /// A custom monotomic timestamp imlementation
-        pub uptime: fn() -> Microsecond,
+        pub uptime: fn() -> super::Microsecond,
         /// A custom pause implementation,
         /// this is allowed to panic.
         pub pause: Option<fn(bool) -> ()>,

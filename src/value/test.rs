@@ -21,5 +21,7 @@ fn test_value_serde() {
 }
 
 // warns if enum size changes
-static_assertions::assert_eq_size!(FrcValue, [u8; 24]);
+const _: fn() = || {
+    let _ = core::mem::transmute::<FrcValue, [u8; 24]>;
+};
 

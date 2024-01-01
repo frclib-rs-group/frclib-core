@@ -59,7 +59,7 @@ pub(crate) fn initialize_time_callbacks<T: ClockDriver>(name: &'static str) {
     }
     let r#impl = crate::time::__private::TimeImplementation {
         implementation_name: name,
-        uptime: T::uptime,
+        uptime: || T::uptime().value(),
         pause: if T::CAN_PAUSE {
             Some(|should_pause: bool| unsafe { T::pause(should_pause) })
         } else {
