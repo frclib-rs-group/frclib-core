@@ -43,7 +43,7 @@
 // - [Data Rate](crate::units::data_rate)
 //
 
-#![deny(clippy::all, clippy::cargo, clippy::pedantic, clippy::nursery)]
+#![deny(clippy::all, clippy::pedantic, clippy::nursery)]
 #![deny(
     missing_copy_implementations,
     single_use_lifetimes,

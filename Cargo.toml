@@ -7,13 +7,8 @@ description = "A collection of utilities to be used across the FRC in rust ecosy
 repository = "https://github.com/oh-yes-0-fps/frclib-core"
 rust-version = "1.75.0"
 keywords = [
-    "First Robotics",
-    "First Robotics Competition",
-    "FRC",
-    "FRC rust"
 ]
 categories = [
-    "robotics"
 ]
 authors = [
     "Bowan Foryt"
