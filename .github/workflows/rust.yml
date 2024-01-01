@@ -1,4 +1,4 @@
-name: Rust
+name: Test and Build
 
 on:
   push:
@@ -15,8 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose -F full
-    - name: Run tests
-      run: cargo test --verbose -F full
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.76.0
+      - name: Build
+        run: cargo build --verbose -F full
+      - name: Run tests
+        run: cargo test --verbose -F full
