@@ -1,6 +1,6 @@
 [package]
 name = "frclib-core"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license = "MIT"
 description = "A collection of utilities to be used across the FRC in rust ecosystem"
@@ -46,9 +46,11 @@ basic = ["value-union", "time"]
 full = ["basic", "units", "hal"]
 
 
+[package.metadata.docs.rs]
+all-features = true
 
-
-
+[package.metadata.playground]
+features = ["full"]
 
 
 [workspace]
