@@ -5,7 +5,7 @@ edition = "2021"
 license = "MIT"
 description = "A collection of utilities to be used across the FRC in rust ecosystem"
 repository = "https://github.com/oh-yes-0-fps/frc-uti-rs"
-rust-version = "1.76.0"
+rust-version = "1.75.0"
 keywords = [
     "First Robotics",
     "First Robotics Competition",
