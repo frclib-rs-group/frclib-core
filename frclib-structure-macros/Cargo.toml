@@ -18,7 +18,6 @@ categories = [
 authors = [
     "Bowan Foryt"
 ]
-readme = "README.md"
 
 [lib]
 proc-macro = true
