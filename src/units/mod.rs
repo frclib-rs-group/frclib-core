@@ -78,4 +78,4 @@ pub mod torque;
 #[doc(hidden)]
 mod test;
 #[doc(hidden)]
-mod macros;
+pub mod macros;

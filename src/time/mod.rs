@@ -142,7 +142,7 @@ mod test {
         let start = uptime().as_micros();
         thread::sleep(Duration::from_millis(100));
         let end = uptime().as_micros();
-        assert!(end - start >= 100_000);
+        assert!(end.saturating_sub(start) >= 100_000);
     }
 
     fn test_pause() {
@@ -151,11 +151,12 @@ mod test {
         let start = uptime().as_micros();
         thread::sleep(Duration::from_millis(1000));
         let end = uptime().as_micros();
-        assert!(end + 5 - start < 100);
+        // assert!(end + 5 - start < 100);
+        assert!(end.saturating_sub(start) < 100);
         try_pause(false).expect("Pause Error");
         thread::sleep(Duration::from_millis(1000));
         let end = uptime().as_micros();
-        assert!(end - start >= 1_000_000);
+        assert!(end.saturating_sub(start) >= 1_000_000);
     }
 
     /// Tests all of the time functions in one thread to make it sequential

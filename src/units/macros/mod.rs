@@ -12,7 +12,7 @@ pub use paste;
 /// This macro is used to define a new unit of measurement.
 /// 
 /// # Example
-/// ```no_run
+/// ```
 /// use frclib_core::unit;
 /// 
 /// unit!(DegreeFloat: float);
@@ -122,13 +122,17 @@ macro_rules! unit {
 /// This macro is used to define a conversion between two units of the same dimension.
 /// 
 /// # Example
-/// ```no_run
+/// ```
 /// use frclib_core::{unit_conversion, unit};
 /// 
 /// unit!(Degree: float);
 /// unit!(Radian: float);
 /// 
 /// unit_conversion!(Degree(float) <-> Radian(float) ~ degree_to_radian);
+/// 
+/// fn degree_to_radian(degree: f64) -> f64 {
+///     degree.to_radians()
+/// }
 /// ````
 #[macro_export]
 macro_rules! unit_conversion {
@@ -167,8 +171,8 @@ macro_rules! unit_conversion {
 /// and allows for functions to be generic over all units of a family.
 /// 
 /// # Example
-/// ```no_run
-/// use frclib_core::{unit_family, unit};
+/// ```
+/// use frclib_core::{unit_family, unit, unit_conversion};
 /// 
 /// unit!(Degree: float);
 /// unit!(Radian: float);
@@ -179,6 +183,18 @@ macro_rules! unit_conversion {
 /// unit_conversion!(Radian(float) <-> Rotation(float) ~ radian_to_rotation);
 /// 
 /// unit_family!(Angle(Radian): Degree, Rotation);
+/// 
+/// fn degree_to_radian(degree: f64) -> f64 {
+///     degree.to_radians()
+/// }
+/// 
+/// fn degree_to_rotation(degree: f64) -> f64 {
+///     degree / 360.0
+/// }
+/// 
+/// fn radian_to_rotation(radian: f64) -> f64 {
+///     degree_to_rotation(radian.to_degrees())
+/// }
 /// ````
 #[macro_export]
 macro_rules! unit_family {
@@ -222,7 +238,7 @@ macro_rules! unit_family {
 /// A macro for defining a unit dimension analysis.
 /// 
 /// # Example
-/// ```no_run
+/// ```
 /// use frclib_core::{unit_dim_analysis, unit};
 /// 
 /// unit!(Degree: float);

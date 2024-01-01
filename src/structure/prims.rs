@@ -1,21 +1,3 @@
-// pub trait FrcStructure
-// where
-//     Self: Sized,
-// {
-//     const SCHEMA: &'static str;
-//     const TYPE: &'static str;
-//     const SIZE: usize;
-//     const DESCRIPTION: FrcStructDesc = FrcStructDesc {
-//         schema: Self::SCHEMA,
-//         type_str: Self::TYPE,
-//         size: Self::SIZE,
-//     };
-
-//     fn pack(&self, buffer: &mut impl BufMut);
-
-//     fn unpack(buffer: &mut impl Buf) -> Self;
-// }
-
 macro_rules! empty_schema_supplier {
     () => {
         || String::with_capacity(0)

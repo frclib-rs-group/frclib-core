@@ -232,6 +232,23 @@ impl From<FrcTimestampedValue> for FrcValue {
         v.value
     }
 }
+impl<T: Into<Self>> From<Option<T>> for FrcValue {
+    fn from(v: Option<T>) -> Self {
+        match v {
+            Some(v) => v.into(),
+            None => Self::Void,
+        }
+    }
+}
+impl<const N: usize, T> From<[T; N]> for FrcValue
+where
+    Box<[T]>: Into<Self> //i love rust
+{
+    fn from(v: [T; N]) -> Self {
+        let boxed: Box<[T]> = Box::from(v);
+        boxed.into()
+    }
+}
 
 impl TryFrom<FrcValue> for f64 {
     type Error = FrcValueCastError;
