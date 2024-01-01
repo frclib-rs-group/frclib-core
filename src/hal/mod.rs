@@ -47,7 +47,6 @@ pub trait HALDriver:
     + SpiDriver
     + I2cDriver
     + UartDriver
-    + UserInterfaceDriver
     */
     + 'static {
     /// The name of the driver, used for logging/debugging.
@@ -96,7 +95,6 @@ impl HAL {
     pub fn init<Driver: HALDriver>() {
         assert!(size_of::<Driver>() == 0, "Driver must be zero sized");
         Driver::init();
-        #[cfg(not(test))]
         initialize_time_callbacks::<Driver>(Driver::NAME);
         Self {
             driver_name: Driver::NAME,

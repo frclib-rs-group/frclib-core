@@ -3,6 +3,9 @@
 //! This crate contains the core functionality for the rust FRC ecosystem.
 //! Whenever a crate that `frclib` depends on needs to use an frc feature it will use this crate to prevent circular dependencies.
 //! 
+//! This library goes as far as it can to be panic free,
+//! the only function that can panic is [HAL Initialization](crate::hal::HAL).
+//! 
 //! ## Modules
 //! 
 //! ### [Value](crate::value)
@@ -99,9 +102,6 @@ pub mod value;
 pub mod units;
 #[cfg(feature = "time")]
 pub mod time;
-#[cfg(feature = "logging")]
-///
-pub mod logging;
 #[cfg(feature = "structure")]
 pub mod structure;
 #[cfg(feature = "hal")]
