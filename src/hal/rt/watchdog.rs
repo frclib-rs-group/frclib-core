@@ -1,6 +1,6 @@
 //! A module for the HAL watchdog driver.
 
-use crate::{units::energy::Volt, hal::NotSimError};
+use crate::{hal::NotSimError, units::energy::Volt};
 
 /// A trait for the watchdog driver
 pub trait WatchdogDriver: 'static {
@@ -29,7 +29,10 @@ pub struct WatchdogVTable {
 }
 impl WatchdogVTable {
     pub(crate) fn from_driver<T: WatchdogDriver>() -> Self {
-        assert!(std::mem::size_of::<T>() == 0, "Watchdog Driver must be zero sized");
+        assert!(
+            std::mem::size_of::<T>() == 0,
+            "Watchdog Driver must be zero sized"
+        );
         Self {
             enabled: T::enabled,
             system_power: T::system_power,
@@ -39,7 +42,10 @@ impl WatchdogVTable {
     }
 
     pub(crate) fn from_sim_driver<T: SimWatchdogDriver>() -> Self {
-        assert!(std::mem::size_of::<T>() == 0, "Watchdog Driver must be zero sized");
+        assert!(
+            std::mem::size_of::<T>() == 0,
+            "Watchdog Driver must be zero sized"
+        );
         Self {
             enabled: T::enabled,
             system_power: T::system_power,
@@ -74,9 +80,10 @@ impl WatchdogVTable {
     /// Returns `Err` if not initialized with sim support
     #[allow(clippy::missing_errors_doc)]
     pub fn set_system_power(&self, voltage: Volt) -> Result<(), NotSimError> {
-        self.set_system_power.map_or(Err(NotSimError), |set_system_power| {
-            set_system_power(voltage);
-            Ok(())
-        })
+        self.set_system_power
+            .map_or(Err(NotSimError), |set_system_power| {
+                set_system_power(voltage);
+                Ok(())
+            })
     }
 }

@@ -53,7 +53,10 @@ pub trait ClockDriver: 'static {
 
 #[allow(dead_code)]
 pub(crate) fn initialize_time_callbacks<T: ClockDriver>(name: &'static str) {
-    assert!(std::mem::size_of::<T>() == 0, "Clock Driver must be zero sized");
+    assert!(
+        std::mem::size_of::<T>() == 0,
+        "Clock Driver must be zero sized"
+    );
     if T::USE_DEFAULT_DRIVER {
         return;
     }

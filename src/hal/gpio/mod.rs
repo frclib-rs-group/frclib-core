@@ -101,7 +101,7 @@ pub trait GPIODriver {
     //
 
     /// Returns a new analog input for the specified port.
-    /// 
+    ///
     /// # Errors
     /// - [`GPIOError::PortNotAvailable`] if the port is not available for analog in use
     /// - [`GPIOError::PortInUse`] if the port is already in use
@@ -122,7 +122,7 @@ pub trait GPIODriver {
     fn new_digital_input(port: u8) -> Result<DigitalInput, GPIOError>;
 
     /// Returns a new digital output for the specified port.
-    /// 
+    ///
     /// # Errors
     /// - [`GPIOError::PortNotAvailable`] if the port is not available for digital out use
     /// - [`GPIOError::PortInUse`] if the port is already in use
@@ -181,7 +181,6 @@ pub trait SimGPIODriver: GPIODriver {
     fn sim_digital_output(port: u8) -> DigitalInput;
 }
 
-
 /// A struct that defines a platform specific GPIO driver for user code.
 #[derive(Debug, Clone, Copy)]
 pub struct GPIOVTable {
@@ -198,7 +197,10 @@ pub struct GPIOVTable {
 
 impl GPIOVTable {
     pub(crate) fn from_driver<T: GPIODriver>() -> Self {
-        assert!(std::mem::size_of::<T>() == 0, "GPIO Driver must be zero sized");
+        assert!(
+            std::mem::size_of::<T>() == 0,
+            "GPIO Driver must be zero sized"
+        );
         Self {
             new_analog_input: T::new_analog_input,
             new_analog_output: T::new_analog_output,
@@ -212,7 +214,10 @@ impl GPIOVTable {
     }
 
     pub(crate) fn from_sim_driver<T: SimGPIODriver>() -> Self {
-        assert!(std::mem::size_of::<T>() == 0, "GPIO Driver must be zero sized");
+        assert!(
+            std::mem::size_of::<T>() == 0,
+            "GPIO Driver must be zero sized"
+        );
         Self {
             new_analog_input: T::new_analog_input,
             new_analog_output: T::new_analog_output,
@@ -226,7 +231,7 @@ impl GPIOVTable {
     }
 
     /// Returns a new analog input for the specified port.
-    /// 
+    ///
     /// # Errors
     /// - [`GPIOError::PortNotAvailable`] if the port is not available for analog use
     /// - [`GPIOError::PortInUse`] if the port is already in use
@@ -253,7 +258,7 @@ impl GPIOVTable {
     }
 
     /// Returns a new digital output for the specified port.
-    /// 
+    ///
     /// # Errors
     /// - [`GPIOError::PortNotAvailable`] if the port is not available for digital out use
     /// - [`GPIOError::PortInUse`] if the port is already in use
@@ -265,39 +270,31 @@ impl GPIOVTable {
     /// If not sim this function will return `Err(NotSimError)`
     #[allow(clippy::missing_errors_doc)]
     pub fn sim_analog_input(&self, port: u8) -> Result<AnalogOutput, NotSimError> {
-        self.sim_analog_input.map_or(
-            Err(NotSimError),
-            |f| Ok((f)(port))
-        )
+        self.sim_analog_input
+            .map_or(Err(NotSimError), |f| Ok((f)(port)))
     }
 
     /// Returns the other end of the analog output port as an [`AnalogInput`] if initialized as sim.
     /// If not sim this function will return `Err(NotSimError)`
     #[allow(clippy::missing_errors_doc)]
     pub fn sim_analog_output(&self, port: u8) -> Result<AnalogInput, NotSimError> {
-        self.sim_analog_output.map_or(
-            Err(NotSimError),
-            |f| Ok((f)(port))
-        )
+        self.sim_analog_output
+            .map_or(Err(NotSimError), |f| Ok((f)(port)))
     }
 
     /// Returns the other end of the digital input port as an [`DigitalOutput`] if initialized as sim.
     /// If not sim this function will return `Err(NotSimError)`
     #[allow(clippy::missing_errors_doc)]
     pub fn sim_digital_input(&self, port: u8) -> Result<DigitalOutput, NotSimError> {
-        self.sim_digital_input.map_or(
-            Err(NotSimError),
-            |f| Ok((f)(port))
-        )
+        self.sim_digital_input
+            .map_or(Err(NotSimError), |f| Ok((f)(port)))
     }
 
     /// Returns the other end of the digital output port as an [`DigitalInput`] if initialized as sim.
     /// If not sim this function will return `Err(NotSimError)`
     #[allow(clippy::missing_errors_doc)]
     pub fn sim_digital_output(&self, port: u8) -> Result<DigitalInput, NotSimError> {
-        self.sim_digital_output.map_or(
-            Err(NotSimError),
-            |f| Ok((f)(port))
-        )
+        self.sim_digital_output
+            .map_or(Err(NotSimError), |f| Ok((f)(port)))
     }
 }

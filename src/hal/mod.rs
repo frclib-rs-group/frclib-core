@@ -12,7 +12,7 @@ use std::{cell::RefCell, mem::size_of};
 use self::{
     gpio::SimGPIODriver,
     rt::{
-        station_interface::{StationInterfaceVTable, StationInterfaceDriver},
+        station_interface::{StationInterfaceDriver, StationInterfaceVTable},
         watchdog::SimWatchdogDriver,
     },
 };
@@ -64,7 +64,7 @@ pub trait HALDriver:
 
 /// A trait that defines a HAL(Hardware Abstraction Layer) Driver with sim support.
 /// Should be implemented by a platform specific HAL Driver Zero Sized Type.
-/// 
+///
 /// A HAL with sim support should implement this trait instead of [`HALDriver`],
 /// because of this a HAL with sim support can be used in as a [`HALDriver`] too.
 pub trait SimHALDriver: HALDriver + SimGPIODriver + SimWatchdogDriver {}
@@ -186,7 +186,7 @@ impl HAL {
 }
 
 /// Returns the current [`HAL`] instance.
-/// 
+///
 /// # Errors
 ///  - [`HALNotInitializedError`] if the [`HAL`] has not been initialized
 pub fn get_hal() -> Result<HAL, HALNotInitializedError> {
@@ -196,9 +196,9 @@ pub fn get_hal() -> Result<HAL, HALNotInitializedError> {
     }
     #[cfg(test)]
     {
-        HAL_INSTANCE_LOCAL.with(|local_hal_instance| {
-            *local_hal_instance.borrow()
-        }).ok_or(HALNotInitializedError)
+        HAL_INSTANCE_LOCAL
+            .with(|local_hal_instance| *local_hal_instance.borrow())
+            .ok_or(HALNotInitializedError)
     }
 }
 

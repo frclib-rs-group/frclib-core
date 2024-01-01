@@ -1,4 +1,3 @@
-
 // #[derive(Debug, Clone, Copy)]
 // pub struct CanFDFrame {
 //     pub id: u32,

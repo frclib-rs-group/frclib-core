@@ -1,11 +1,8 @@
-
-
 /// NOT FOR DIRECT USE
 #[doc(hidden)]
 #[macro_export]
 macro_rules! inner_unit_conversion {
     ($unit_a:ident $type_a:ty | $unit_b:ident $type_b:ty : $conv_fn:ident) => {
-
         #[allow(trivial_numeric_casts)]
         impl From<$unit_a> for $unit_b {
             fn from(value: $unit_a) -> Self {
@@ -52,7 +49,9 @@ macro_rules! inner_unit_conversion {
         #[allow(trivial_numeric_casts)]
         impl std::cmp::PartialOrd<$unit_b> for $unit_a {
             fn partial_cmp(&self, other: &$unit_b) -> Option<std::cmp::Ordering> {
-                self.0.partial_cmp(&((other.0 / $conv_fn(<$type_a>::from(1.0)) as $type_b) as $type_a))
+                self.0.partial_cmp(
+                    &((other.0 / $conv_fn(<$type_a>::from(1.0)) as $type_b) as $type_a),
+                )
             }
         }
     };

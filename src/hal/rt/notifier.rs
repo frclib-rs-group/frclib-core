@@ -2,13 +2,12 @@
 
 use crate::units::time::Microsecond;
 
-
 /// The type of update to perform on the alarm
 #[derive(Debug, Clone, Copy)]
 pub enum NotifierUpdateType {
     /// Will set alarm to trigger every X microseconds.
     /// If canceled the alarm will stop re-priming and the current alarm will be removed
-    Periodic{
+    Periodic {
         /// The period to trigger at
         period: Microsecond,
         /// If true, if an entire alarm is missed it will be ignored.
@@ -17,13 +16,13 @@ pub enum NotifierUpdateType {
     },
     /// Will set alarm to trigger at the specified time.
     /// If canceled the current alarm will be removed
-    OneShot{
+    OneShot {
         /// The time to trigger at
         trigger_time: Microsecond,
     },
     /// Will set alarm to trigger at the specified time relative to the current time.
     /// If canceled the current alarm will be removed
-    RelativeOneShot{
+    RelativeOneShot {
         /// The time from now to trigger at
         trigger_offset_time: Microsecond,
     },
@@ -43,18 +42,17 @@ pub trait Notifier: Send + Sync {
 }
 type NotifierHandle = Box<dyn Notifier>;
 
-
 /// A platform specific alarm notifier driver.
-/// 
+///
 /// # Implementation
 /// Most of the work for this driver involves setting up the interrupt logic.
 /// It's reccomended for the notifier thread to be created on first use of the driver
 /// and have the thread be high priority.
-/// 
+///
 /// # Safety
 /// ## Thread Safety
 /// It's up to the driver developer to ensure that the driver is thread safe.
-/// 
+///
 /// # Development Resources
 /// - [WPILib Rio Notifier](https://github.com/wpilibsuite/allwpilib/blob/main/hal/src/main/native/athena/Notifier.cpp)
 /// - [WPILib Sim Notifier](https://github.com/wpilibsuite/allwpilib/blob/main/hal/src/main/native/sim/Notifier.cpp)
@@ -72,7 +70,10 @@ pub struct NotifierVTable {
 }
 impl NotifierVTable {
     pub(crate) fn from_driver<T: NotifierDriver>() -> Self {
-        assert!(std::mem::size_of::<T>() == 0, "Notifier Driver must be zero sized");
+        assert!(
+            std::mem::size_of::<T>() == 0,
+            "Notifier Driver must be zero sized"
+        );
         Self {
             new_notifier: || Box::new(T::new_notifier()),
         }

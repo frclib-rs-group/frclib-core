@@ -18,7 +18,6 @@ pub trait DigitalOutputChannel: Channel {
 /// A type represting a type erased [``DigitalOutputChannel``](DigitalOutputChannel).
 pub type DigitalOutput = Box<dyn DigitalOutputChannel>;
 
-
 /// A variety of [``Channel``](super::Channel) that can read and write digital data.
 pub trait DigitalBiChannel: DigitalInputChannel + DigitalOutputChannel {}
 

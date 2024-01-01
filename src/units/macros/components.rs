@@ -1,10 +1,8 @@
-
 /// NOT FOR DIRECT USE
 #[doc(hidden)]
 #[macro_export]
 macro_rules! unit_general {
     ($unit_name:ident : f64) => {
-
         impl From<f64> for $unit_name {
             fn from(value: f64) -> Self {
                 Self(value)
@@ -201,8 +199,8 @@ macro_rules! unit_general {
 macro_rules! unit_binops {
     ($unit_name:ident : $type:ty) => {
         impl<T> std::ops::Add<T> for $unit_name
-        where 
-            T: Into<Self>
+        where
+            T: Into<Self>,
         {
             type Output = Self;
             #[must_use]
@@ -439,10 +437,8 @@ macro_rules! unit_neg {
                 Self(-self.0)
             }
         }
-    }
+    };
 }
-
-
 
 /// NOT FOR DIRECT USE
 #[doc(hidden)]
@@ -556,7 +552,7 @@ macro_rules! unit_structure {
             }
 
             fn unpack(buffer: &mut impl $crate::structure::bytes::Buf) -> Self {
-                Self (buffer.get_u64_le())
+                Self(buffer.get_u64_le())
             }
         }
     };

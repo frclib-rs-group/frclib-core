@@ -37,11 +37,13 @@ impl TryFrom<u64> for FrcValue {
     type Error = FrcValueCastError;
 
     fn try_from(value: u64) -> Result<Self, Self::Error> {
-        Ok(Self::Int(i64::try_from(value).map_err(|_| FrcValueCastError::InvalidCastFrom(
-            stringify!(u64),
-            FrcType::Int,
-            CastErrorReason::Overflow,
-        ))?))
+        Ok(Self::Int(i64::try_from(value).map_err(|_| {
+            FrcValueCastError::InvalidCastFrom(
+                stringify!(u64),
+                FrcType::Int,
+                CastErrorReason::Overflow,
+            )
+        })?))
     }
 }
 impl From<u32> for FrcValue {
@@ -134,11 +136,15 @@ impl TryFrom<Vec<u64>> for FrcValue {
     fn try_from(v: Vec<u64>) -> Result<Self, Self::Error> {
         Ok(Self::IntArray(
             v.into_iter()
-                .map(|v| i64::try_from(v).map_err(|_| FrcValueCastError::InvalidCastFrom(
-                    stringify!(u64),
-                    FrcType::Int,
-                    CastErrorReason::Overflow,
-                )))
+                .map(|v| {
+                    i64::try_from(v).map_err(|_| {
+                        FrcValueCastError::InvalidCastFrom(
+                            stringify!(u64),
+                            FrcType::Int,
+                            CastErrorReason::Overflow,
+                        )
+                    })
+                })
                 .collect::<Result<Box<[i64]>, FrcValueCastError>>()?,
         ))
     }
@@ -148,11 +154,15 @@ impl TryFrom<Box<[u64]>> for FrcValue {
     fn try_from(v: Box<[u64]>) -> Result<Self, Self::Error> {
         Ok(Self::IntArray(
             v.iter()
-                .map(|v| i64::try_from(*v).map_err(|_| FrcValueCastError::InvalidCastFrom(
-                    stringify!(u64),
-                    FrcType::Int,
-                    CastErrorReason::Overflow,
-                )))
+                .map(|v| {
+                    i64::try_from(*v).map_err(|_| {
+                        FrcValueCastError::InvalidCastFrom(
+                            stringify!(u64),
+                            FrcType::Int,
+                            CastErrorReason::Overflow,
+                        )
+                    })
+                })
                 .collect::<Result<Box<[i64]>, FrcValueCastError>>()?,
         ))
     }
@@ -242,7 +252,7 @@ impl<T: Into<Self>> From<Option<T>> for FrcValue {
 }
 impl<const N: usize, T> From<[T; N]> for FrcValue
 where
-    Box<[T]>: Into<Self> //i love rust
+    Box<[T]>: Into<Self>, //i love rust
 {
     fn from(v: [T; N]) -> Self {
         let boxed: Box<[T]> = Box::from(v);
@@ -318,23 +328,21 @@ impl TryFrom<FrcValue> for i32 {
     type Error = FrcValueCastError;
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
-            FrcValue::Int(v) => {
-                Self::try_from(v).map_err(|_| {
-                    if v < 0 {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(i32),
-                            CastErrorReason::Underflow,
-                        )
-                    } else {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(i32),
-                            CastErrorReason::Overflow,
-                        )
-                    }
-                })
-            }
+            FrcValue::Int(v) => Self::try_from(v).map_err(|_| {
+                if v < 0 {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(i32),
+                        CastErrorReason::Underflow,
+                    )
+                } else {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(i32),
+                        CastErrorReason::Overflow,
+                    )
+                }
+            }),
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(i32),
@@ -348,23 +356,21 @@ impl TryFrom<FrcValue> for i16 {
     type Error = FrcValueCastError;
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
-            FrcValue::Int(v) => {
-                Self::try_from(v).map_err(|_| {
-                    if v < 0 {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(i16),
-                            CastErrorReason::Underflow,
-                        )
-                    } else {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(i16),
-                            CastErrorReason::Overflow,
-                        )
-                    }
-                })
-            }
+            FrcValue::Int(v) => Self::try_from(v).map_err(|_| {
+                if v < 0 {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(i16),
+                        CastErrorReason::Underflow,
+                    )
+                } else {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(i16),
+                        CastErrorReason::Overflow,
+                    )
+                }
+            }),
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(i16),
@@ -378,23 +384,21 @@ impl TryFrom<FrcValue> for i8 {
     type Error = FrcValueCastError;
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
-            FrcValue::Int(v) => {
-                Self::try_from(v).map_err(|_| {
-                    if v < 0 {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(i8),
-                            CastErrorReason::Underflow,
-                        )
-                    } else {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(i8),
-                            CastErrorReason::Overflow,
-                        )
-                    }
-                })
-            }
+            FrcValue::Int(v) => Self::try_from(v).map_err(|_| {
+                if v < 0 {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(i8),
+                        CastErrorReason::Underflow,
+                    )
+                } else {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(i8),
+                        CastErrorReason::Overflow,
+                    )
+                }
+            }),
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(i8),
@@ -408,13 +412,13 @@ impl TryFrom<FrcValue> for u64 {
     type Error = FrcValueCastError;
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
-            FrcValue::Int(v) => {
-                Self::try_from(v).map_err(|_| FrcValueCastError::InvalidCastTo(
+            FrcValue::Int(v) => Self::try_from(v).map_err(|_| {
+                FrcValueCastError::InvalidCastTo(
                     value.get_type(),
                     stringify!(u64),
                     CastErrorReason::Underflow,
-                ))
-            }
+                )
+            }),
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(u64),
@@ -428,23 +432,21 @@ impl TryFrom<FrcValue> for u32 {
     type Error = FrcValueCastError;
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
-            FrcValue::Int(v) => {
-                Self::try_from(v).map_err(|_| {
-                    if v < 0 {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(u32),
-                            CastErrorReason::Underflow,
-                        )
-                    } else {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(u32),
-                            CastErrorReason::Overflow,
-                        )
-                    }
-                })
-            }
+            FrcValue::Int(v) => Self::try_from(v).map_err(|_| {
+                if v < 0 {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(u32),
+                        CastErrorReason::Underflow,
+                    )
+                } else {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(u32),
+                        CastErrorReason::Overflow,
+                    )
+                }
+            }),
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(u32),
@@ -458,23 +460,21 @@ impl TryFrom<FrcValue> for u16 {
     type Error = FrcValueCastError;
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
-            FrcValue::Int(v) => {
-                Self::try_from(v).map_err(|_| {
-                    if v < 0 {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(u16),
-                            CastErrorReason::Underflow,
-                        )
-                    } else {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(u16),
-                            CastErrorReason::Overflow,
-                        )
-                    }
-                })
-            }
+            FrcValue::Int(v) => Self::try_from(v).map_err(|_| {
+                if v < 0 {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(u16),
+                        CastErrorReason::Underflow,
+                    )
+                } else {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(u16),
+                        CastErrorReason::Overflow,
+                    )
+                }
+            }),
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(u16),
@@ -488,23 +488,21 @@ impl TryFrom<FrcValue> for u8 {
     type Error = FrcValueCastError;
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
-            FrcValue::Int(v) => {
-                Self::try_from(v).map_err(|_| {
-                    if v < 0 {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(u8),
-                            CastErrorReason::Underflow,
-                        )
-                    } else {
-                        FrcValueCastError::InvalidCastTo(
-                            value.get_type(),
-                            stringify!(u8),
-                            CastErrorReason::Overflow,
-                        )
-                    }
-                })
-            }
+            FrcValue::Int(v) => Self::try_from(v).map_err(|_| {
+                if v < 0 {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(u8),
+                        CastErrorReason::Underflow,
+                    )
+                } else {
+                    FrcValueCastError::InvalidCastTo(
+                        value.get_type(),
+                        stringify!(u8),
+                        CastErrorReason::Overflow,
+                    )
+                }
+            }),
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(u8),
@@ -561,8 +559,7 @@ impl TryFrom<FrcValue> for Vec<f64> {
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
             FrcValue::DoubleArray(va) => Ok(Self::from(va)),
-            FrcValue::FloatArray(va) => Ok(va.iter().map(
-                |v| f64::from(*v)).collect()),
+            FrcValue::FloatArray(va) => Ok(va.iter().map(|v| f64::from(*v)).collect()),
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(Vec<f64>),
@@ -878,7 +875,9 @@ impl TryFrom<FrcValue> for Vec<String> {
     type Error = FrcValueCastError;
     fn try_from(value: FrcValue) -> Result<Self, Self::Error> {
         match value {
-            FrcValue::StringArray(va) => Ok(va.iter().map(std::string::ToString::to_string).collect()),
+            FrcValue::StringArray(va) => {
+                Ok(va.iter().map(std::string::ToString::to_string).collect())
+            }
             _ => Err(FrcValueCastError::InvalidCastTo(
                 value.get_type(),
                 stringify!(Vec<String>),
@@ -887,7 +886,6 @@ impl TryFrom<FrcValue> for Vec<String> {
         }
     }
 }
-
 
 use bytes::Bytes;
 use rmpv::Value as MPValue;
@@ -915,29 +913,29 @@ impl TryFrom<MPValue> for FrcValue {
                 if arr.iter().all(|v| v.get_type() == first_type) {
                     match first_type {
                         FrcType::Boolean => Ok(Self::BooleanArray(
-                            arr.into_iter().map(
-                                bool::try_from
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?,
+                            arr.into_iter()
+                                .map(bool::try_from)
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::Int => Ok(Self::IntArray(
-                            arr.into_iter().map(
-                                i64::try_from
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                            arr.into_iter()
+                                .map(i64::try_from)
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::Float => Ok(Self::FloatArray(
-                            arr.into_iter().map(
-                                f32::try_from
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                            arr.into_iter()
+                                .map(f32::try_from)
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::Double => Ok(Self::DoubleArray(
-                            arr.into_iter().map(
-                                f64::try_from
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                            arr.into_iter()
+                                .map(f64::try_from)
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::String => Ok(Self::StringArray(
-                            arr.into_iter().map(
-                                |v| String::try_from(v).map(Box::from)
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                            arr.into_iter()
+                                .map(|v| String::try_from(v).map(Box::from))
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         any => Err(FrcValueCastError::InvalidCastTo(
                             any,
@@ -967,26 +965,20 @@ impl From<FrcValue> for MPValue {
             FrcValue::Float(f) => Self::F32(f),
             FrcValue::Double(f) => Self::F64(f),
             FrcValue::String(s) => Self::String(s.to_string().into()),
-            FrcValue::BooleanArray(a) => Self::Array(
-                a.iter()
-                    .map(|v| Self::Boolean(*v))
-                    .collect::<Vec<Self>>(),
-            ),
+            FrcValue::BooleanArray(a) => {
+                Self::Array(a.iter().map(|v| Self::Boolean(*v)).collect::<Vec<Self>>())
+            }
             FrcValue::IntArray(a) => Self::Array(
                 a.iter()
                     .map(|v| Self::Integer((*v).into()))
                     .collect::<Vec<Self>>(),
             ),
-            FrcValue::FloatArray(a) => Self::Array(
-                a.iter()
-                    .map(|v| Self::F32(*v))
-                    .collect::<Vec<Self>>(),
-            ),
-            FrcValue::DoubleArray(a) => Self::Array(
-                a.iter()
-                    .map(|v| Self::F64(*v))
-                    .collect::<Vec<Self>>(),
-            ),
+            FrcValue::FloatArray(a) => {
+                Self::Array(a.iter().map(|v| Self::F32(*v)).collect::<Vec<Self>>())
+            }
+            FrcValue::DoubleArray(a) => {
+                Self::Array(a.iter().map(|v| Self::F64(*v)).collect::<Vec<Self>>())
+            }
             FrcValue::StringArray(a) => Self::Array(
                 a.iter()
                     .map(|v| Self::String(v.to_string().into()))
@@ -1032,29 +1024,29 @@ impl TryFrom<JSONValue> for FrcValue {
                 if arr.iter().all(|v| v.get_type() == first_type) {
                     match first_type {
                         FrcType::Boolean => Ok(Self::BooleanArray(
-                            arr.into_iter().map(
-                                bool::try_from
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?,
+                            arr.into_iter()
+                                .map(bool::try_from)
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::Int => Ok(Self::IntArray(
-                            arr.into_iter().map(
-                                i64::try_from
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                            arr.into_iter()
+                                .map(i64::try_from)
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::Float => Ok(Self::FloatArray(
-                            arr.into_iter().map(
-                                f32::try_from
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                            arr.into_iter()
+                                .map(f32::try_from)
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::Double => Ok(Self::DoubleArray(
-                            arr.into_iter().map(
-                                f64::try_from
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                            arr.into_iter()
+                                .map(f64::try_from)
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::String => Ok(Self::StringArray(
-                            arr.into_iter().map(
-                                |v| String::try_from(v).map(Box::from)
-                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                            arr.into_iter()
+                                .map(|v| String::try_from(v).map(Box::from))
+                                .collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         any => Err(FrcValueCastError::InvalidCastTo(
                             any,
@@ -1090,11 +1082,10 @@ impl From<FrcValue> for JSONValue {
             }),
             FrcValue::Float(f) => Self::Number(
                 serde_json::Number::from_f64(f64::from(f))
-                    .unwrap_or_else(|| serde_json::Number::from(0))
+                    .unwrap_or_else(|| serde_json::Number::from(0)),
             ),
             FrcValue::Double(f) => Self::Number(
-                serde_json::Number::from_f64(f)
-                    .unwrap_or_else(|| serde_json::Number::from(0))
+                serde_json::Number::from_f64(f).unwrap_or_else(|| serde_json::Number::from(0)),
             ),
             FrcValue::String(s) => Self::String(s.into()),
             FrcValue::Raw(b) => Self::Array(
@@ -1120,18 +1111,22 @@ impl From<FrcValue> for JSONValue {
             ),
             FrcValue::FloatArray(a) => Self::Array(
                 a.iter()
-                    .map(|v| Self::Number(
-                        serde_json::Number::from_f64(f64::from(*v))
-                            .unwrap_or_else(|| serde_json::Number::from(0))
-                    ))
+                    .map(|v| {
+                        Self::Number(
+                            serde_json::Number::from_f64(f64::from(*v))
+                                .unwrap_or_else(|| serde_json::Number::from(0)),
+                        )
+                    })
                     .collect::<Vec<Self>>(),
             ),
             FrcValue::DoubleArray(a) => Self::Array(
                 a.iter()
-                    .map(|v| Self::Number(
-                        serde_json::Number::from_f64(*v)
-                            .unwrap_or_else(|| serde_json::Number::from(0))
-                    ))
+                    .map(|v| {
+                        Self::Number(
+                            serde_json::Number::from_f64(*v)
+                                .unwrap_or_else(|| serde_json::Number::from(0)),
+                        )
+                    })
                     .collect::<Vec<Self>>(),
             ),
             FrcValue::StringArray(a) => Self::Array(

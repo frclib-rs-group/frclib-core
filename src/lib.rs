@@ -1,15 +1,15 @@
 //! # frclib-core
-//! 
+//!
 //! This crate contains the core functionality for the rust FRC ecosystem.
 //! Whenever a crate that `frclib` depends on needs to use an frc feature it will use this crate to prevent circular dependencies.
-//! 
+//!
 //! This library goes as far as it can to be panic free,
 //! the only function that can panic is [HAL Initialization](crate::hal::HAL).
-//! 
+//!
 // ## Modules
-// 
+//
 // ### [Value](crate::value)
-// 
+//
 // This module contains the [``FrcValue``](crate::value::FrcValue) type which is used to represent values in various frc protocols.
 // Variants:
 // - [Void](crate::value::FrcValue::Void)
@@ -23,9 +23,9 @@
 // - [String Array](crate::value::FrcValue::StringArray)
 // - [Raw](crate::value::FrcValue::Raw)
 // - [Struct](crate::value::FrcValue::Struct)
-// 
+//
 // ### [Units](crate::units)
-// 
+//
 // This module contains a variety of units and unit families with macros for user defined units.
 // Units:
 // - [Time](crate::units::time)
@@ -41,7 +41,7 @@
 // - [Torque](crate::units::torque)
 // - [Data](crate::units::data)
 // - [Data Rate](crate::units::data_rate)
-// 
+//
 
 #![deny(clippy::all, clippy::cargo, clippy::pedantic, clippy::nursery)]
 #![deny(
@@ -89,20 +89,15 @@
         clippy::expect_used
     )
 )]
-#![cfg_attr(
-    not(test),
-    warn(
-        missing_docs
-    )
-)]
+#![cfg_attr(not(test), warn(missing_docs))]
 
-#[cfg(feature = "value-union")]
-pub mod value;
-#[cfg(feature = "units")]
-pub mod units;
-#[cfg(feature = "time")]
-pub mod time;
-#[cfg(feature = "structure")]
-pub mod structure;
 #[cfg(feature = "hal")]
 pub mod hal;
+#[cfg(feature = "structure")]
+pub mod structure;
+#[cfg(feature = "time")]
+pub mod time;
+#[cfg(feature = "units")]
+pub mod units;
+#[cfg(feature = "value-union")]
+pub mod value;

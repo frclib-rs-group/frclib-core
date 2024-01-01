@@ -1,5 +1,3 @@
-
-
 /// NOT FOR DIRECT USE
 #[doc(hidden)]
 #[macro_export]
@@ -71,7 +69,6 @@ macro_rules! forward_into_args {
 #[macro_export]
 macro_rules! unit_float {
     ($unit_name:ident) => {
-
         impl num::traits::NumCast for $unit_name {
             fn from<T: num::traits::ToPrimitive>(n: T) -> Option<Self> {
                 n.to_f64().map(Self)
@@ -132,7 +129,7 @@ macro_rules! unit_float {
                 f64::is_sign_positive as is_sign_positive(self) -> bool;
                 f64::is_sign_negative as is_sign_negative(self) -> bool;
             }
-            $crate::forward_into_args!{
+            $crate::forward_into_args! {
                 f64::mul_add as mul_add(self, a: Self, b: Self) -> Self;
                 f64::log as log(self, base: Self) -> Self;
                 f64::hypot as hypot(self, other: Self) -> Self;
@@ -155,7 +152,6 @@ macro_rules! unit_float {
         }
     };
 }
-
 
 /// NOT FOR DIRECT USE
 #[doc(hidden)]
@@ -253,7 +249,7 @@ macro_rules! unit_integer {
                 num::traits::CheckedNeg::checked_neg(&self.0).map(Self)
             }
         }
-    }
+    };
 }
 
 /// NOT FOR DIRECT USE
@@ -330,5 +326,5 @@ macro_rules! unit_uinteger {
                 num::traits::CheckedRem::checked_rem(&self.0, &other.0).map(Self)
             }
         }
-    }
+    };
 }

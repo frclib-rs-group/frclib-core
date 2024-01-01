@@ -1,4 +1,3 @@
-
 #[macro_use]
 mod components;
 #[macro_use]
@@ -10,11 +9,11 @@ pub use paste;
 
 /// A macro for defining a unit of measurement.
 /// This macro is used to define a new unit of measurement.
-/// 
+///
 /// # Example
 /// ```
 /// use frclib_core::unit;
-/// 
+///
 /// unit!(DegreeFloat: float);
 /// unit!(RadianInt: int);
 /// unit!(RotationUint: uint);
@@ -120,16 +119,16 @@ macro_rules! unit {
 
 /// A macro for defining a unit conversion.
 /// This macro is used to define a conversion between two units of the same dimension.
-/// 
+///
 /// # Example
 /// ```
 /// use frclib_core::{unit_conversion, unit};
-/// 
+///
 /// unit!(Degree: float);
 /// unit!(Radian: float);
-/// 
+///
 /// unit_conversion!(Degree(float) <-> Radian(float) ~ degree_to_radian);
-/// 
+///
 /// fn degree_to_radian(degree: f64) -> f64 {
 ///     degree.to_radians()
 /// }
@@ -169,29 +168,29 @@ macro_rules! unit_conversion {
 /// Unit families allow all units to fall under a single trait.
 /// This allows for easy conversion between units of the same family
 /// and allows for functions to be generic over all units of a family.
-/// 
+///
 /// # Example
 /// ```
 /// use frclib_core::{unit_family, unit, unit_conversion};
-/// 
+///
 /// unit!(Degree: float);
 /// unit!(Radian: float);
 /// unit!(Rotation: float);
-/// 
+///
 /// unit_conversion!(Degree(float) <-> Radian(float) ~ degree_to_radian);
 /// unit_conversion!(Degree(float) <-> Rotation(float) ~ degree_to_rotation);
 /// unit_conversion!(Radian(float) <-> Rotation(float) ~ radian_to_rotation);
-/// 
+///
 /// unit_family!(Angle(Radian): Degree, Rotation);
-/// 
+///
 /// fn degree_to_radian(degree: f64) -> f64 {
 ///     degree.to_radians()
 /// }
-/// 
+///
 /// fn degree_to_rotation(degree: f64) -> f64 {
 ///     degree / 360.0
 /// }
-/// 
+///
 /// fn radian_to_rotation(radian: f64) -> f64 {
 ///     degree_to_rotation(radian.to_degrees())
 /// }
@@ -236,15 +235,15 @@ macro_rules! unit_family {
 }
 
 /// A macro for defining a unit dimension analysis.
-/// 
+///
 /// # Example
 /// ```
 /// use frclib_core::{unit_dim_analysis, unit};
-/// 
+///
 /// unit!(Degree: float);
 /// unit!(Second: float);
 /// unit!(DegreePerSecond: float);
-/// 
+///
 /// unit_dim_analysis!(DegreePerSecond * Second = Degree);
 /// // also supports division but mult implicitly adds support for division the other way
 /// ```
@@ -393,7 +392,6 @@ macro_rules! unit_dim_analysis {
         }
     };
 }
-
 
 #[cfg(test)]
 mod test {

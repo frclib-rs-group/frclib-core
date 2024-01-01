@@ -2,7 +2,7 @@ use crate::units::data_rate::{
     BytesPerSecond, GigabytesPerHour, KilobytesPerSecond, MegabytesPerSecond,
 };
 use crate::units::time::Second;
-use crate::{unit, unit_conversion, unit_family, unit_dim_analysis};
+use crate::{unit, unit_conversion, unit_dim_analysis, unit_family};
 
 use super::time::Hour;
 

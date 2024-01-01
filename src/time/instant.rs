@@ -1,4 +1,7 @@
-use std::{ops::{Add, AddAssign, Sub, SubAssign}, time::Duration};
+use std::{
+    ops::{Add, AddAssign, Sub, SubAssign},
+    time::Duration,
+};
 
 type StdInstant = std::time::Instant;
 
@@ -7,7 +10,7 @@ static START_INSTANT: StdInstant = StdInstant::now();
 
 /// A new-type wrapper around [`std::time::Duration`]
 /// that can be used as an alternative to [`std::time::Instant`].
-/// 
+///
 /// Unlike [`std::time::Instant`], this type is not guaranteed to be monotonic.
 /// Can be safely converted to and from [`std::time::Instant`] but is not recommended unless you know what you're doing.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

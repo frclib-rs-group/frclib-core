@@ -1,4 +1,3 @@
-
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
@@ -13,7 +12,8 @@ pub fn frc_structure(input: TokenStream) -> TokenStream {
 
 /// rerurns `<typ as FrcStructure>`
 fn type_as_frcstructure(typ: &syn::Type) -> syn::Type {
-    let path = syn::parse_str::<syn::Path>("FrcStructure").expect("Failed to parse FrcStructure path");
+    let path =
+        syn::parse_str::<syn::Path>("FrcStructure").expect("Failed to parse FrcStructure path");
     let typ = typ.clone();
     syn::Type::Path(syn::TypePath {
         qself: Some(QSelf {
@@ -27,7 +27,6 @@ fn type_as_frcstructure(typ: &syn::Type) -> syn::Type {
     })
 }
 
-
 fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
     // every supported field type implements `FrcStructure`
     // so we can use it to generate the schema, size, pack, and unpack functions
@@ -37,20 +36,23 @@ fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
     let mut field_names: Vec<syn::Ident> = Vec::new();
 
     //filter out non structs
-    let syn::Data::Struct(syn::DataStruct {
-        fields,
-        ..
-    }) = &ast.data else {
+    let syn::Data::Struct(syn::DataStruct { fields, .. }) = &ast.data else {
         panic!("Only structs are supported");
     };
 
     match fields {
         syn::Fields::Named(syn::FieldsNamed { named, .. }) => {
             for field in named {
-                let field_name = field.ident.as_ref().expect("Only named fields are supported");
+                let field_name = field
+                    .ident
+                    .as_ref()
+                    .expect("Only named fields are supported");
                 let field_type = &field.ty;
                 field_names.push(field_name.clone());
-                field_strs.push(syn::LitStr::new(field_name.to_string().as_str(), field_name.span()));
+                field_strs.push(syn::LitStr::new(
+                    field_name.to_string().as_str(),
+                    field_name.span(),
+                ));
                 field_types.push(field_type.clone());
             }
         }
@@ -63,7 +65,7 @@ fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
         //         field_types.push(field_type.clone());
         //     }
         // }
-        _ => panic!("Unit structs are not supported")
+        _ => panic!("Unit structs are not supported"),
     };
     field_types = field_types.iter().map(type_as_frcstructure).collect();
 
@@ -71,24 +73,42 @@ fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
     let schema = {
         let schema_template = "{}".repeat(field_types.len());
         let format_exprs = {
-            field_types.iter().zip(field_strs.iter())
+            field_types
+                .iter()
+                .zip(field_strs.iter())
                 .map(|(typ, name)| {
-                    format!("{}::format_field({})", typ.into_token_stream(), name.into_token_stream())
-                }).collect::<Vec<_>>()
+                    format!(
+                        "{}::format_field({})",
+                        typ.into_token_stream(),
+                        name.into_token_stream()
+                    )
+                })
+                .collect::<Vec<_>>()
         };
-        syn::parse_str::<syn::Expr>(
-            &format!("format!(\"{}\", {})", schema_template, format_exprs.join(", "))
-        ).expect("Failed to parse format! call")
+        syn::parse_str::<syn::Expr>(&format!(
+            "format!(\"{}\", {})",
+            schema_template,
+            format_exprs.join(", ")
+        ))
+        .expect("Failed to parse format! call")
     };
 
     //generate size
     let size = {
         let mut size = syn::parse_str::<syn::Expr>("0usize").expect("Failed to parse 0usize");
         for typ in field_types.iter() {
-            let size_expr = syn::parse_str::<syn::Expr>(format!("{}::SIZE", typ.into_token_stream()).as_str())
-                .expect("Failed to parse size");
-            size = syn::parse_str::<syn::Expr>(format!("{} + {}", size.into_token_stream(), size_expr.into_token_stream()).as_str())
-                .expect("Failed to parse size addition");
+            let size_expr =
+                syn::parse_str::<syn::Expr>(format!("{}::SIZE", typ.into_token_stream()).as_str())
+                    .expect("Failed to parse size");
+            size = syn::parse_str::<syn::Expr>(
+                format!(
+                    "{} + {}",
+                    size.into_token_stream(),
+                    size_expr.into_token_stream()
+                )
+                .as_str(),
+            )
+            .expect("Failed to parse size addition");
         }
         size
     };
@@ -97,7 +117,12 @@ fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
     let pack = {
         let mut pack = "{".to_string();
         for (typ, name) in field_types.iter().zip(field_names.iter()) {
-            pack = format!("{}{}::pack(&self.{}, buffer);", pack, typ.into_token_stream(), name.into_token_stream());
+            pack = format!(
+                "{}{}::pack(&self.{}, buffer);",
+                pack,
+                typ.into_token_stream(),
+                name.into_token_stream()
+            );
         }
         pack = format!("{}}}", pack);
         syn::parse_str::<syn::Stmt>(pack.as_str()).expect("Failed to parse pack statement")
@@ -107,10 +132,16 @@ fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
     let unpack = {
         let mut unpack = "Self {".to_string();
         for (typ, name) in field_types.iter().zip(field_names.iter()) {
-            unpack = format!("{}{}: {}::unpack(buffer),", unpack, name.into_token_stream(), typ.into_token_stream());
+            unpack = format!(
+                "{}{}: {}::unpack(buffer),",
+                unpack,
+                name.into_token_stream(),
+                typ.into_token_stream()
+            );
         }
         unpack = format!("{}}}", unpack);
-        syn::parse_str::<syn::ExprStruct>(unpack.as_str()).expect("Failed to parse unpack expression")
+        syn::parse_str::<syn::ExprStruct>(unpack.as_str())
+            .expect("Failed to parse unpack expression")
     };
 
     quote! {

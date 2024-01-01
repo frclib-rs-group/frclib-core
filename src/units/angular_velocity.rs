@@ -1,4 +1,4 @@
-use crate::{unit_family, unit, unit_conversion};
+use crate::{unit, unit_conversion, unit_family};
 
 unit!(DegreePerSecond: float);
 unit!(RadianPerSecond: float);

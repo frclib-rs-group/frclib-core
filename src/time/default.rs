@@ -16,8 +16,7 @@ pub(super) fn default_uptime_source() -> u64 {
             .2
             .map_or(0, |start| start.elapsed().as_micros());
         let elapsed_paused_uptime = time_statics.1.as_micros();
-        u64::try_from(abs_uptime - (paused_uptime + elapsed_paused_uptime))
-            .unwrap_or(u64::MAX)
+        u64::try_from(abs_uptime - (paused_uptime + elapsed_paused_uptime)).unwrap_or(u64::MAX)
     } else {
         // use asserts instead of panics because of linting, i know i shouldn't be trying to
         // go around the linter but this will so rarely happen that i don't want to have to

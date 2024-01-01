@@ -1,5 +1,5 @@
 //! A pluggable time interface for FRC.
-//! 
+//!
 //! This allows for utilities to be written and run on any platform,
 //! not caring what it should use for a time source.
 
@@ -44,7 +44,7 @@ pub enum PauseError {
 }
 
 /// Pauses the time with platforms that support it
-/// 
+///
 /// # Errors
 ///  - [`PauseError::PauseNotImplemented`] if [`pause_implemented`] returns false
 ///  - [`PauseError::AlreadyPaused`] if the [`is_paused`] is true and `should_pause` is true
@@ -106,10 +106,10 @@ pub mod __private {
 
     ///This is called by the HAL to set the time implementation,
     ///could be called in other places but is not recommended.
-    /// 
+    ///
     /// # Safety
     /// - This function is not thread safe and should only be called once
-    /// 
+    ///
     /// # Panics
     /// - If called more than once
     pub unsafe fn set_time_implementation(time_imp: TimeImplementation) {

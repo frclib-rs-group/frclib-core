@@ -1,4 +1,3 @@
-use crate::{unit_family, unit, unit_conversion, unit_dim_analysis};
 use crate::units::angular_acceleration::{
     DegreePerSecondSquared, RadianPerSecondSquared, RotationPerMinuteSquared,
     RotationPerSecondSquared,
@@ -7,6 +6,7 @@ use crate::units::angular_velocity::{
     DegreePerSecond, RadianPerSecond, RotationPerMinute, RotationPerSecond,
 };
 use crate::units::time::{Minute, Second};
+use crate::{unit, unit_conversion, unit_dim_analysis, unit_family};
 
 unit!(Degree: float);
 unit!(Radian: float);

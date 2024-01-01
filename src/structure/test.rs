@@ -36,7 +36,7 @@ fn test_structures() {
         test_struct: Meter,
         test_struct_arr: [Meter; 2],
         integer: i32,
-        string: [char; 128]
+        string: [char; 128],
     }
 
     let test_struct = Meter { value: 1.0 };
@@ -63,7 +63,11 @@ fn test_structures() {
 
     //iterate through all inventory values of FrcStructureDescription and print type_str
     for struct_desc in inventory::iter::<FrcStructDesc> {
-        println!("{} {{{}}}", struct_desc.type_str, (struct_desc.schema_supplier)());
+        println!(
+            "{} {{{}}}",
+            struct_desc.type_str,
+            (struct_desc.schema_supplier)()
+        );
     }
 }
 

@@ -7,7 +7,7 @@ pub enum CastErrorReason {
     Type,
     Overflow,
     Underflow,
-    Deserialization
+    Deserialization,
 }
 
 /// An error that occurs when casting between [``FrcValue``](super::FrcValue) and other types
