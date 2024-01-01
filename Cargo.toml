@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 description = "A collection of utilities to be used across the FRC in rust ecosystem"
-repository = "https://github.com/oh-yes-0-fps/frc-uti-rs"
+repository = "https://github.com/oh-yes-0-fps/frclib-core"
 rust-version = "1.75.0"
 keywords = [
     "First Robotics",
@@ -32,7 +32,7 @@ nalgebra = { version = "0.32", optional = true}
 num = { version = "0.4", optional = true}
 simba = { version = "0.8", optional = true}
 ctor = { version = "0.2.5", optional = true}
-frclib-structure-macros = { path = "./frclib-structure-macros", optional = true}
+frclib-structure-macros = { version = "0.1.0", path = "./frclib-structure-macros", optional = true}
 paste = { version = "1.0.14", optional = true }
 
 [dev-dependencies]

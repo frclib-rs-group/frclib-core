@@ -2,7 +2,23 @@
 name = "frclib-structure-macros"
 version = "0.1.0"
 edition = "2021"
-publish = false
+license = "MIT"
+description = "A derive macro for implementing the FrcStruct trait on structs"
+repository = "https://github.com/oh-yes-0-fps/frclib-core"
+rust-version = "1.75.0"
+keywords = [
+    "First Robotics",
+    "First Robotics Competition",
+    "FRC",
+    "FRC rust"
+]
+categories = [
+    "robotics"
+]
+authors = [
+    "Bowan Foryt"
+]
+readme = "README.md"
 
 [lib]
 proc-macro = true
