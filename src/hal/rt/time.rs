@@ -1,3 +1,6 @@
+//! Real Time Clock HAL Driver.
+//! Not for direct use by users, use [`crate::time`] instead.
+
 use crate::units::time::Microsecond;
 
 /// A platform specific Monotonic Clock driver.

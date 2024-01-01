@@ -1,28 +1,48 @@
+//! A platform and driver station independent interface for interacting with the user control station.
+
+/// The commanded enable state of the robot.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum EnabledState {
+    /// The robot is unable to actuate any mechanisms.
     #[default]
     Disabled,
-    Enabled,
+    /// Same as [`Disabled`](EnabledState::Disabled) but the robot has to be restarted to re-enable.
     EStopped,
+    /// The robot is able to actuate mechanisms.
+    Enabled,
 }
 
+/// The commanded mode of the robot.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Mode {
+    /// The is being controlled by a user directly.
     #[default]
     Teleop,
+    /// The robot is being controlled by a user code autonomously.
     Auto,
+    /// The robot is being controlled by a user directly for testing purposes.
     Test,
 }
 
-#[derive(Debug, Clone, PartialEq, Default)]
+/// The data for a single joystick.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct JoystickData {
+    /// If the joystick is plugged in.
     pub plugged_in: bool,
-    pub axes: Vec<f32>,
-    pub buttons: bitvec::vec::BitVec,
-    pub povs: Vec<i16>,
+    /// An array of the joystick axies,
+    /// this can be lossy if the joystick has more than 8 axies.
+    pub axies: [f32; 8],
+    /// An array of the joystick buttons,
+    /// this can be lossy if the joystick has more than 32 buttons.
+    pub buttons: u32,
+    /// An array of the joystick povs,
+    /// this can be lossy if the joystick has more than 4 povs.
+    pub povs: [i16; 4],
 }
 
-#[derive(Debug, Clone, Default)]
+/// The data for the current station.
+#[allow(missing_docs)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct StationData {
     pub enabled_state: EnabledState,
     pub mode: Mode,
@@ -32,6 +52,7 @@ pub struct StationData {
     pub joysticks: [JoystickData; 8],
 }
 
+/// A trait that represents a platform specific user control station interface.
 pub trait StationInterfaceDriver: 'static {
     /// Will send an error message to the driver station console,
     /// driver station has to support error messages.
@@ -56,6 +77,7 @@ pub trait StationInterfaceDriver: 'static {
     fn get_station_data() -> StationData;
 }
 
+/// A struct that defines a platform specific user control station interface for user code.
 #[derive(Debug, Clone, Copy)]
 pub struct StationInterfaceVTable {
     pub(crate) send_console_line_error: fn(line: &str, location: &str, callstack: &str),

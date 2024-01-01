@@ -17,7 +17,7 @@ unit_conversion!(Centimeter(float) <-> Inch(float) ~ centimeter_to_inch);
 unit_dim_analysis!(MetersPerSecond * Second = Meter);
 unit_dim_analysis!(FeetPerSecond * Second = Foot);
 
-unit_family!(Distance(Meter): Inch, Feet, Centimeter);
+unit_family!(Distance(Meter): Inch, Foot, Centimeter);
 
 fn meter_to_foot(meter: f64) -> f64 {
     meter * 3.28084
@@ -41,32 +41,4 @@ fn centimeter_to_foot(centimeter: f64) -> f64 {
 
 fn centimeter_to_inch(centimeter: f64) -> f64 {
     meter_to_inch(centimeter / 100.0)
-}
-
-impl Meter {
-    #[must_use]
-    pub fn per_second(self, seconds: Second) -> MetersPerSecond {
-        MetersPerSecond::new(self.value() * seconds.value())
-    }
-}
-
-impl Foot {
-    #[must_use]
-    pub fn per_second(self, seconds: Second) -> FeetPerSecond {
-        FeetPerSecond::new(self.value() * seconds.value())
-    }
-}
-
-impl Inch {
-    #[must_use]
-    pub fn to_feet_per_second(self, seconds: Second) -> FeetPerSecond {
-        FeetPerSecond::new(self.value() * seconds.value() / 12.0)
-    }
-}
-
-impl Centimeter {
-    #[must_use]
-    pub fn to_meter_per_second(self, seconds: Second) -> MetersPerSecond {
-        MetersPerSecond::new(self.value() * seconds.value() / 100.0)
-    }
 }

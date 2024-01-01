@@ -1,3 +1,6 @@
+//! This module contains an implementation of [WPIlib struct spec](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc)
+//! for rust and a macro to generate the trait implementation for a given struct.
+
 #[cfg(test)]
 mod test;
 
@@ -9,23 +12,30 @@ use bytes::{Buf, BufMut};
 pub use bytes;
 pub use inventory;
 
+/// A description of a structure, used for serialization and deserialization
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FrcStructDesc {
+    /// A function that returns the schema of the structure,
+    /// this is needed because the schema cannot be made in a const context
     pub schema_supplier: fn() -> String,
+    /// The type of the structure, typically the name of the rust type
     pub type_str: &'static str,
+    /// The size of the structure in bytes
     pub size: usize,
 }
 
 inventory::collect!(FrcStructDesc);
 
+/// A global database of structure descriptions
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct FrcStructDescDB;
 
 impl FrcStructDescDB {
-    ///Call very sparringly as this function leaks memory
+    /// Adds a structure description to the global database,
+    /// this is a runtime equivalent of the [`inventory::submit!`] macro.
     #[cold]
     pub fn add(desc: FrcStructDesc) {
-        if Self::contains(desc.type_str) {
+        if Self::contains_type(desc.type_str) {
             return;
         }
         let static_desc_ref = Box::leak(Box::new(desc));
@@ -36,10 +46,11 @@ impl FrcStructDescDB {
         unsafe { inventory::ErasedNode::submit(node.value, Box::leak(Box::new(node))) }
     }
 
-    ///Call very sparringly as this function leaks memory
+    /// Adds a structure description to the global database,
+    /// this is a runtime equivalent of the [`inventory::submit!`] macro.
     #[cold]
     pub fn add_ref(desc: &'static FrcStructDesc) {
-        if Self::contains(desc.type_str) {
+        if Self::contains_type(desc.type_str) {
             return;
         }
         let node = inventory::Node {
@@ -49,13 +60,16 @@ impl FrcStructDescDB {
         unsafe { inventory::ErasedNode::submit(node.value, Box::leak(Box::new(node))) }
     }
 
+    /// Checks if the global database contains a structure description for a given type
     #[must_use]
-    pub fn contains(type_str: &str) -> bool {
+    pub fn contains_type(type_str: &str) -> bool {
         inventory::iter::<FrcStructDesc>
             .into_iter()
             .any(|desc| desc.type_str == type_str)
     }
 
+    /// Gets a structure description from the global database for a given type,
+    /// returns None if the type is not found
     #[must_use]
     pub fn get(type_str: &str) -> Option<&'static FrcStructDesc> {
         inventory::iter::<FrcStructDesc>
@@ -65,21 +79,35 @@ impl FrcStructDescDB {
 }
 
 pub use frclib_structure_macros::FrcStructure;
+
+/// A trait that allows serialization and deserialization of arbitrary structures
+/// to and from a [``FrcValue``](crate::value::FrcValue)
 pub trait FrcStructure
 where
     Self: Sized + Copy,
 {
+    /// The schema of the structure,
+    /// this is a string that describes the format of the structure
     const SCHEMA_SUPPLIER: fn() -> String;
+    /// The type of the structure as a string,
+    /// this is typically the name of the rust type
     const TYPE: &'static str;
+    /// The size of the structure in bytes
     const SIZE: usize;
+    /// An [``FrcStructDesc``](crate::structure::FrcStructDesc) that describes the structure,
+    /// it's composed of [`SIZE`](crate::structure::FrcStructure::SIZE),
+    /// [`TYPE`](crate::structure::FrcStructure::TYPE),
+    /// and [`SCHEMA_SUPPLIER`](crate::structure::FrcStructure::SCHEMA_SUPPLIER)
     const DESCRIPTION: FrcStructDesc = FrcStructDesc {
         schema_supplier: Self::SCHEMA_SUPPLIER,
         type_str: Self::TYPE,
         size: Self::SIZE,
     };
 
+    /// Packs the structure into a buffer
     fn pack(&self, buffer: &mut impl BufMut);
 
+    /// Unpacks the structure from a buffer
     fn unpack(buffer: &mut impl Buf) -> Self;
 
     #[must_use]

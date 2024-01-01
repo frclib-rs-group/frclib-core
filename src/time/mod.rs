@@ -1,3 +1,8 @@
+//! A pluggable time interface for FRC.
+//! 
+//! This allows for utilities to be written and run on any platform,
+//! not caring what it should use for a time source.
+
 mod default;
 mod instant;
 
@@ -25,6 +30,7 @@ pub fn uptime() -> Duration {
     unsafe { UPTIME_SOURCE() }.into()
 }
 
+#[allow(missing_docs)]
 #[derive(Debug, thiserror::Error, Clone, Copy)]
 pub enum PauseError {
     #[error("Pause not implemented for {} time source", unsafe { IMPLEMENTATION_NAME })]
@@ -99,6 +105,12 @@ pub mod __private {
 
     ///This is called by the HAL to set the time implementation,
     ///could be called in other places but is not recommended.
+    /// 
+    /// # Safety
+    /// - This function is not thread safe and should only be called once
+    /// 
+    /// # Panics
+    /// - If called more than once
     pub unsafe fn set_time_implementation(time_imp: TimeImplementation) {
         use std::sync::atomic::Ordering;
         assert!(
@@ -110,7 +122,6 @@ pub mod __private {
         super::UPTIME_SOURCE = time_imp.uptime;
         super::IMPLEMENTATION_NAME = time_imp.implementation_name;
         super::SYSTEM_TIME_VALID = time_imp.system_time_valid;
-        #[allow(clippy::option_if_let_else)]
         if let Some(pause) = time_imp.pause {
             super::PAUSE_IMPLEMENTED.store(true, Ordering::Relaxed);
             super::UPTIME_PAUSE = pause;

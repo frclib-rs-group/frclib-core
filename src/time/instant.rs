@@ -1,7 +1,15 @@
 use std::{ops::{Add, AddAssign, Sub, SubAssign}, time::Duration};
 
+type StdInstant = std::time::Instant;
 
+#[ctor::ctor]
+static START_INSTANT: StdInstant = StdInstant::now();
 
+/// A new-type wrapper around [`std::time::Duration`]
+/// that can be used as an alternative to [`std::time::Instant`].
+/// 
+/// Unlike [`std::time::Instant`], this type is not guaranteed to be monotonic.
+/// Can be safely converted to and from [`std::time::Instant`] but is not recommended unless you know what you're doing.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Instant(Duration);
 
@@ -91,5 +99,17 @@ impl Sub<Self> for Instant {
 impl SubAssign<Duration> for Instant {
     fn sub_assign(&mut self, rhs: Duration) {
         self.0 -= rhs;
+    }
+}
+
+impl From<StdInstant> for Instant {
+    fn from(instant: StdInstant) -> Self {
+        Self(instant.duration_since(*START_INSTANT))
+    }
+}
+
+impl From<Instant> for StdInstant {
+    fn from(instant: Instant) -> Self {
+        *START_INSTANT + instant.0
     }
 }

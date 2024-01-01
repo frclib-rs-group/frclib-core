@@ -1,3 +1,5 @@
+//! Real Time Notifier HAL Driver
+
 use crate::units::time::Microsecond;
 
 
@@ -59,21 +61,23 @@ type NotifierHandle = Box<dyn Notifier>;
 /// - [Spin Sleep](https://github.com/alexheretic/spin-sleep)
 /// - [Condition Variable](`std::sync::Condvar`)
 pub trait NotifierDriver: 'static {
+    /// Creates a new notifier
     fn new_notifier() -> impl Notifier;
 }
 
+/// A platform specific alarm notifier driver vtable.
 #[derive(Debug, Clone, Copy)]
 pub struct NotifierVTable {
     pub(crate) new_notifier: fn() -> NotifierHandle,
 }
 impl NotifierVTable {
-    #[allow(clippy::needless_pass_by_value)]
     pub(crate) fn from_driver<T: NotifierDriver>() -> Self {
         assert!(std::mem::size_of::<T>() == 0, "Notifier Driver must be zero sized");
         Self {
             new_notifier: || Box::new(T::new_notifier()),
         }
     }
+    /// Creates a new notifier
     #[must_use]
     pub fn new_notifier(&self) -> NotifierHandle {
         (self.new_notifier)()

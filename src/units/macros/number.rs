@@ -1,5 +1,7 @@
 
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! constant {
     ($( $method:ident () -> $ret:expr ; )*)
@@ -11,6 +13,8 @@ macro_rules! constant {
         )*};
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! forward {
     ($( $imp:path as $method:ident ( & self $( , $arg:ident : $ty:ty )* ) -> $ret:ty ; )*)
@@ -29,6 +33,8 @@ macro_rules! forward {
         )*};
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! forward_into {
     ($( $imp:path as $method:ident ( & self $( , $arg:ident : $ty:ty )* ) -> $ret:ty ; )*)
@@ -47,6 +53,8 @@ macro_rules! forward_into {
         )*};
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! forward_into_args {
     ($( $imp:path as $method:ident ( self $( , $arg:ident : $ty:ty )* ) -> $ret:ty ; )*)
@@ -58,6 +66,8 @@ macro_rules! forward_into_args {
         )*};
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_float {
     ($unit_name:ident) => {
@@ -147,6 +157,8 @@ macro_rules! unit_float {
 }
 
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_integer {
     ($unit_name:ident) => {
@@ -244,6 +256,8 @@ macro_rules! unit_integer {
     }
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_uinteger {
     ($unit_name:ident) => {

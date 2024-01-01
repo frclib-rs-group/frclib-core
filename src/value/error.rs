@@ -10,6 +10,8 @@ pub enum CastErrorReason {
     Deserialization
 }
 
+/// An error that occurs when casting between [``FrcValue``](super::FrcValue) and other types
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, Error)]
 pub enum FrcValueCastError {
     #[error("Could not cast {0} variant to {1} type ({2:?})")]

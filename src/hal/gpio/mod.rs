@@ -1,9 +1,11 @@
+//! A module for the HAL GPIO driver.
+
 pub mod analog;
 pub mod digital;
 
 use std::fmt::Display;
 
-#[allow(clippy::upper_case_acronyms)]
+#[allow(clippy::upper_case_acronyms, missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GPIOPortType {
     Analog,
@@ -20,7 +22,7 @@ impl Display for GPIOPortType {
     }
 }
 
-#[allow(variant_size_differences)]
+#[allow(variant_size_differences, missing_docs)]
 #[non_exhaustive]
 #[derive(Debug, thiserror::Error, Clone, Copy, PartialEq)]
 pub enum GPIOError {
@@ -34,7 +36,9 @@ pub enum GPIOError {
     PortInUse(u8),
 }
 
+/// A trait for a GPIO channel.
 pub trait Channel {
+    ///
     fn channel_id(&self) -> u8;
 }
 
@@ -83,9 +87,13 @@ use super::NotSimError;
 /// - [Raspberry Pi GPIO](https://github.com/golemparts/rppal/tree/master)
 /// - [Jetson GPIO](https://github.com/Kajatin/jetson-gpio-rust/tree/main)
 pub trait GPIODriver {
+    /// A list of all analog ports available on the platform.
     const ANALOG_PORTS: &'static [u8];
+    /// A list of all digital ports available on the platform.
     const DIGITAL_PORTS: &'static [u8];
+    /// A list of all PWM ports available on the platform.
     const PWM_PORTS: &'static [u8];
+    /// A list of all relay ports available on the platform.
     const RELAY_PORTS: &'static [u8];
 
     //
@@ -158,7 +166,7 @@ pub trait GPIODriver {
     }
 }
 
-
+/// A platform specific GPIO driver extension for simulation.
 pub trait SimGPIODriver: GPIODriver {
     /// Returns the other end of the analog input port as an [`AnalogOutput`].
     fn sim_analog_input(port: u8) -> AnalogOutput;
@@ -174,7 +182,7 @@ pub trait SimGPIODriver: GPIODriver {
 }
 
 
-
+/// A struct that defines a platform specific GPIO driver for user code.
 #[derive(Debug, Clone, Copy)]
 pub struct GPIOVTable {
     pub(crate) new_analog_input: fn(u8) -> Result<AnalogInput, GPIOError>,

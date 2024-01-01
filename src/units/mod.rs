@@ -47,21 +47,35 @@
 
 
 
-
+/// Angle units
 pub mod angle;
+/// Angular acceleration units
 pub mod angular_acceleration;
+/// Angular velocity units
 pub mod angular_velocity;
+/// Data units
 pub mod data;
+/// Data rate units
 pub mod data_rate;
+/// Distance units
 pub mod distance;
+/// Energy units
 pub mod energy;
+/// Force units
 pub mod linear_velocity;
+/// Linear acceleration units
 pub mod mass;
+/// Linear velocity units
 pub mod moment_of_inertia;
+/// Mass units
 pub mod temperature;
+/// Moment of inertia units
 pub mod time;
+/// Temperature units
 pub mod torque;
 
 #[cfg(test)]
+#[doc(hidden)]
 mod test;
+#[doc(hidden)]
 mod macros;

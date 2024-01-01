@@ -1,4 +1,6 @@
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_general {
     ($unit_name:ident : f64) => {
@@ -193,6 +195,8 @@ macro_rules! unit_general {
     };
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_binops {
     ($unit_name:ident : $type:ty) => {
@@ -422,6 +426,8 @@ macro_rules! unit_binops {
     };
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_neg {
     ($unit_name:ident : $type:ty) => {
@@ -438,6 +444,8 @@ macro_rules! unit_neg {
 
 
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_serde {
     ($unit_name:ident : $type:ty) => {
@@ -454,6 +462,8 @@ macro_rules! unit_serde {
     };
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_num {
     ($unit_name:ident : $type:ty) => {
@@ -501,6 +511,8 @@ macro_rules! unit_num {
     };
 }
 
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
 #[macro_export]
 macro_rules! unit_structure {
     ($unit_name:ident : f64) => {

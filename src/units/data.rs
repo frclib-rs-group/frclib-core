@@ -2,7 +2,9 @@ use crate::units::data_rate::{
     BytesPerSecond, GigabytesPerHour, KilobytesPerSecond, MegabytesPerSecond,
 };
 use crate::units::time::Second;
-use crate::{unit, unit_conversion, unit_family};
+use crate::{unit, unit_conversion, unit_family, unit_dim_analysis};
+
+use super::time::Hour;
 
 unit!(Byte: float);
 unit!(Kilobyte: float);
@@ -17,6 +19,11 @@ unit_conversion!(Kilobyte(float) <-> Gigabyte(float) ~ kilobyte_to_gigabyte);
 unit_conversion!(Megabyte(float) <-> Gigabyte(float) ~ megabyte_to_gigabyte);
 
 unit_family!(Data(Byte): Kilobyte, Megabyte, Gigabyte);
+
+unit_dim_analysis!(BytesPerSecond * Second = Byte);
+unit_dim_analysis!(KilobytesPerSecond * Second = Kilobyte);
+unit_dim_analysis!(MegabytesPerSecond * Second = Megabyte);
+unit_dim_analysis!(GigabytesPerHour * Hour = Gigabyte);
 
 fn byte_to_kilobyte(byte: f64) -> f64 {
     byte / 1000.0
@@ -40,32 +47,4 @@ fn kilobyte_to_gigabyte(kilobyte: f64) -> f64 {
 
 fn megabyte_to_gigabyte(megabyte: f64) -> f64 {
     megabyte / 1000.0
-}
-
-impl Byte {
-    #[must_use]
-    pub fn per_second(self, seconds: Second) -> BytesPerSecond {
-        BytesPerSecond(self.value() * seconds.value())
-    }
-}
-
-impl Kilobyte {
-    #[must_use]
-    pub fn per_second(self, seconds: Second) -> KilobytesPerSecond {
-        KilobytesPerSecond(self.value() * seconds.value())
-    }
-}
-
-impl Megabyte {
-    #[must_use]
-    pub fn per_second(self, seconds: Second) -> MegabytesPerSecond {
-        MegabytesPerSecond(self.value() * seconds.value())
-    }
-}
-
-impl Gigabyte {
-    #[must_use]
-    pub fn per_hour(self, seconds: Second) -> GigabytesPerHour {
-        GigabytesPerHour(self.value() * seconds.value() * 3600.0)
-    }
 }

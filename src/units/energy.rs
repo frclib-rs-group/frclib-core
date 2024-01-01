@@ -16,17 +16,3 @@ fn joule_to_watthour(joule: f64) -> f64 {
 
 unit_dim_analysis!(Volt * Ohm = Watt);
 unit_dim_analysis!(Watt * Second = Joule);
-
-impl Watt {
-    #[must_use]
-    pub fn to_watt_hour(&self, seconds: &Second) -> WattHour {
-        WattHour::new(self.value() / (3600.0 / seconds.value()))
-    }
-}
-
-impl WattHour {
-    #[must_use]
-    pub fn to_watt(&self, seconds: &Second) -> Watt {
-        Watt::new(self.value() * (3600.0 / seconds.value()))
-    }
-}

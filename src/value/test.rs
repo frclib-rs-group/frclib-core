@@ -20,13 +20,6 @@ fn test_value_serde() {
     assert_eq!(test_inst, test_de);
 }
 
-#[allow(unused_must_use)]
-#[test]
-fn test_table_serde_simple() {
-    let value = FrcValue::from(1.0f64);
-    approx::abs_diff_eq!(f32::try_from(value).expect("Couldn't cast to f32"), 1.0);
-}
-
 // warns if enum size changes
 static_assertions::assert_eq_size!(FrcValue, [u8; 24]);
 

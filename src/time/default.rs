@@ -10,7 +10,6 @@ use crate::units::time::Microsecond;
 pub(super) static DEFAULT_TIME_IMPL_STATICS: Mutex<(Instant, Duration, Option<Instant>)> =
     Mutex::new((Instant::now(), Duration::from_secs(0), None));
 
-#[allow(clippy::option_if_let_else)]
 pub(super) fn default_uptime_source() -> Microsecond {
     if let Ok(time_statics) = DEFAULT_TIME_IMPL_STATICS.lock() {
         let abs_uptime = time_statics.0.elapsed().as_micros();
@@ -28,7 +27,6 @@ pub(super) fn default_uptime_source() -> Microsecond {
     }
 }
 
-#[allow(clippy::option_if_let_else)]
 pub(super) fn default_uptime_pause(should_pause: bool) {
     if let Ok(mut time_statics) = DEFAULT_TIME_IMPL_STATICS.lock() {
         if should_pause {

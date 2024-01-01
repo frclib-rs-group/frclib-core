@@ -4,7 +4,7 @@
         "full"
     ],
     "rust-analyzer.cargo.unsetTest": [
-        "frclib-core"
+        // "frclib-core"
     ],
     "rust-analyzer.showUnlinkedFileNotification": false
 }

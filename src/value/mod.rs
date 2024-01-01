@@ -1,3 +1,5 @@
+//! This module contains the [``FrcValue``](crate::value::FrcValue) type which is used to represent values in various frc protocols.
+
 use std::{
     fmt::Display,
     hash::{Hash, Hasher},
@@ -26,6 +28,7 @@ use self::error::CastErrorReason;
 /// depending on source can be from unix epoch or some arbitrary start time
 pub type FrcTimestamp = u64;
 
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FrcType {
     Void,
@@ -41,7 +44,6 @@ pub enum FrcType {
     StringArray,
     Raw,
     Struct(&'static str),
-    // Protobuf,
 }
 impl Display for FrcType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -130,6 +132,7 @@ impl<'a> Deserialize<'a> for FrcType {
 /// Struct is a special type that carries metadata to allow decoding into their inner type or a dynamic object
 ///
 /// Bytes are Boxed to keep the size of the enum small
+#[allow(missing_docs)]
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum FrcValue {
@@ -252,6 +255,7 @@ impl FrcValue {
     pub fn as_timestamped(&self, timestamp: FrcTimestamp) -> FrcTimestampedValue {
         FrcTimestampedValue::new(timestamp, self.clone())
     }
+    /// Consumes itself to a tagged value with the given type
     #[must_use]
     pub fn to_tagged(self) -> FrcTaggedValue {
         FrcTaggedValue {
@@ -284,6 +288,7 @@ impl FrcValue {
 }
 
 impl FrcValue {
+    /// Converts the given [``FrcStructure``](crate::structure::FrcStructure) into a [``FrcValue``](FrcValue)
     pub fn from_struct<T: FrcStructure>(value: &T) -> Self {
         let mut buffer = BytesMut::with_capacity(T::SIZE);
         value.pack(&mut buffer);
@@ -291,6 +296,7 @@ impl FrcValue {
     }
 
     /// # Errors
+    /// Returns an error if the value is not a struct or the struct is not the correct type
     pub fn try_into_struct<T: FrcStructure>(self) -> Result<T, FrcValueCastError> {
         let frc_type = self.get_type();
         match self {
@@ -314,10 +320,14 @@ impl FrcValue {
     }
 }
 
+/// An [``FrcValue``](FrcValue) with a [``FrcType``](FrcType) attached,
+/// best used for serialization and deserialization where keeping the type is important
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash)]
 pub struct FrcTaggedValue {
     #[serde(rename = "type")]
+    /// The type of the value
     pub r#type: FrcType,
+    /// The value
     pub value: FrcValue,
 }
 impl Display for FrcTaggedValue {
@@ -326,9 +336,15 @@ impl Display for FrcTaggedValue {
     }
 }
 
+/// An [``FrcValue``](FrcValue) with a [``FrcTimestamp``](FrcTimestamp) attached,
+/// important for passing to logging systems
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash)]
 pub struct FrcTimestampedValue {
+    /// The timestamp of the value,
+    /// typically the uptime of the robot if running on the robot
+    /// and the unix epoch if running on desktop
     pub timestamp: FrcTimestamp,
+    /// The value
     pub value: FrcValue,
 }
 impl Display for FrcTimestampedValue {
@@ -337,44 +353,44 @@ impl Display for FrcTimestampedValue {
     }
 }
 impl FrcTimestampedValue {
+    /// Creates a new timestamped value
     #[must_use]
     pub const fn new(timestamp: FrcTimestamp, value: FrcValue) -> Self {
         Self { timestamp, value }
     }
-    #[must_use]
-    pub const fn get_type(&self) -> FrcType {
-        self.value.get_type()
-    }
-    #[must_use]
-    pub const fn is_empty(&self) -> bool {
-        self.value.is_empty()
-    }
-    #[must_use]
-    pub const fn is_array(&self) -> bool {
-        self.value.is_array()
-    }
+    /// Checks if the timestamp is after the given timestamp
     #[must_use]
     pub const fn is_after_timestamp(&self, timestamp: FrcTimestamp) -> bool {
         self.timestamp > timestamp
     }
+    /// Checks if the timestamp is after the given timestamped value
     #[must_use]
     pub const fn is_after_other(&self, other: &Self) -> bool {
         self.timestamp > other.timestamp
     }
+    /// Checks if the timestamp is before the given timestamp
     #[must_use]
     pub const fn is_before_timestamp(&self, timestamp: FrcTimestamp) -> bool {
         self.timestamp < timestamp
     }
+    /// Checks if the timestamp is before the given timestamped value
     #[must_use]
     pub const fn is_before_other(&self, other: &Self) -> bool {
         self.timestamp < other.timestamp
     }
 }
 
+/// A timestamped value with a key attached,
+/// important for passing to pub/sub logging systems
 #[derive(Debug, Clone)]
 pub struct FrcEntry {
+    /// The timestamp of the value,
+    /// typically the uptime of the robot if running on the robot
+    /// and the unix epoch if running on desktop
     pub timestamp: FrcTimestamp,
+    /// The value
     pub value: FrcValue,
+    /// The key
     pub key: &'static str,
 }
 impl Display for FrcEntry {

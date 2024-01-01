@@ -1,3 +1,5 @@
+//! This module contains what is needed to write and use a HAL(Hardware Abstraction Layer).
+
 pub mod comm;
 pub mod gpio;
 pub mod rt;
@@ -32,6 +34,8 @@ thread_local! {
     static HAL_INSTANCE_LOCAL: RefCell<Option<HAL>> = RefCell::new(None);
 }
 
+/// A trait that defines a HAL(Hardware Abstraction Layer) Driver.
+/// Should be implemented by a platform specific HAL Driver Zero Sized Type.
 pub trait HALDriver:
     GPIODriver
     + ClockDriver
@@ -46,12 +50,24 @@ pub trait HALDriver:
     + UserInterfaceDriver
     */
     + 'static {
+    /// The name of the driver, used for logging/debugging.
     const NAME: &'static str;
 
+    /// Will only be called once per program execution.
+    /// Can be used to setup global state for the driver.
     fn init();
+
+    /// Will only be called once per program execution but is not guaranteed to be called.
+    /// Will always be called after [`init`].
+    /// Can be used to cleanup global state for the driver.
     fn cleanup();
 }
 
+/// A trait that defines a HAL(Hardware Abstraction Layer) Driver with sim support.
+/// Should be implemented by a platform specific HAL Driver Zero Sized Type.
+/// 
+/// A HAL with sim support should implement this trait instead of [`HALDriver`],
+/// because of this a HAL with sim support can be used in as a [`HALDriver`] too.
 pub trait SimHALDriver: HALDriver + SimGPIODriver + SimWatchdogDriver {}
 
 /// A struct that defines a platform specific HAL(Hardware Abstraction Layer) using a Driver.
@@ -117,6 +133,10 @@ impl HAL {
     fn set_hal(self) {
         #[cfg(not(test))]
         {
+            assert!(
+                HAL_INSTANCE.get().is_none(),
+                "HAL has already been initialized"
+            );
             let _ = HAL_INSTANCE.set(self);
         }
         #[cfg(test)]
@@ -167,15 +187,6 @@ impl HAL {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct HALNotInitializedError;
-impl std::fmt::Display for HALNotInitializedError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "`HAL` has not been initialized")
-    }
-}
-impl std::error::Error for HALNotInitializedError {}
-
 /// Returns the current [`HAL`] instance.
 /// 
 /// # Errors
@@ -193,6 +204,8 @@ pub fn get_hal() -> Result<HAL, HALNotInitializedError> {
     }
 }
 
+/// An error that occurs when a function is called that is only available when the [`HAL`] is initialized with sim support
+/// but the [`HAL`] is not initialized with sim support.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct NotSimError;
 impl std::fmt::Display for NotSimError {
@@ -204,3 +217,13 @@ impl std::fmt::Display for NotSimError {
     }
 }
 impl std::error::Error for NotSimError {}
+
+/// An error that occurs when the [`HAL`] has not been initialized but is attempted to be used.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct HALNotInitializedError;
+impl std::fmt::Display for HALNotInitializedError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "`HAL` has not been initialized")
+    }
+}
+impl std::error::Error for HALNotInitializedError {}

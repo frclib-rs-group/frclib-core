@@ -1,5 +1,8 @@
+//! A module for the HAL watchdog driver.
+
 use crate::{units::energy::Volt, hal::NotSimError};
 
+/// A trait for the watchdog driver
 pub trait WatchdogDriver: 'static {
     /// Gets whether the watchdog is enabled
     fn enabled() -> bool;
@@ -7,6 +10,7 @@ pub trait WatchdogDriver: 'static {
     fn system_power() -> Volt;
 }
 
+/// A trait for the sim extension of the watchdog driver
 pub trait SimWatchdogDriver: WatchdogDriver {
     /// Sets whether the watchdog is enabled
     fn set_enabled(enabled: bool);
@@ -14,7 +18,7 @@ pub trait SimWatchdogDriver: WatchdogDriver {
     fn set_system_power(voltage: Volt);
 }
 
-
+/// A type erased version of the watchdog driver
 #[derive(Debug, Clone, Copy)]
 pub struct WatchdogVTable {
     pub(crate) enabled: fn() -> bool,

@@ -5,7 +5,7 @@
 //! 
 //! ## Modules
 //! 
-//! ### [Time](crate::time)
+//! ### [Value](crate::value)
 //! 
 //! This module contains the [``FrcValue``](crate::value::FrcValue) type which is used to represent values in various frc protocols.
 //! Variants:
@@ -69,17 +69,27 @@
     anonymous_parameters,
     clippy::unwrap_used,
     clippy::panicking_unwrap,
+    missing_abi,
+    missing_fragment_specifier,
+    clippy::missing_safety_doc,
+    clippy::missing_asserts_for_indexing,
+    clippy::missing_assert_message,
+    clippy::possible_missing_comma
 )]
-#![allow(clippy::module_name_repetitions)]
-
-//The end goal is to have no panics in the library
+#![allow(clippy::module_name_repetitions, clippy::option_if_let_else)]
 #![cfg_attr(
     not(test),
     forbid(
         clippy::panic,
         clippy::todo,
         clippy::unimplemented,
-        clippy::expect_used,
+        clippy::expect_used
+    )
+)]
+#![cfg_attr(
+    not(test),
+    warn(
+        missing_docs
     )
 )]
 
@@ -90,6 +100,7 @@ pub mod units;
 #[cfg(feature = "time")]
 pub mod time;
 #[cfg(feature = "logging")]
+///
 pub mod logging;
 #[cfg(feature = "structure")]
 pub mod structure;

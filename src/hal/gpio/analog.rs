@@ -1,9 +1,11 @@
+//! Analog GPIO functionality and traits.
+
 use crate::units::energy::Volt;
 
 use super::{Channel, GPIOError, GPIOPortType};
 
 
-
+/// A variety of [``Channel``](super::Channel) that can read analog data.
 pub trait AnalogInputChannel: Channel {
     /// Reads the raw digital data coming from the channel.
     /// no gurantee it can use all 32 bits, for example the `RoboRio`
@@ -20,9 +22,11 @@ pub trait AnalogInputChannel: Channel {
     /// Returns the voltage range of the input
     fn voltage_range(&self) -> (Volt, Volt);
 }
+/// A type represting a type erased [``AnalogInputChannel``](AnalogInputChannel).
 pub type AnalogInput = Box<dyn AnalogInputChannel>;
 
 
+/// A variety of [``Channel``](super::Channel) that can write analog data.
 pub trait AnalogOutputChannel: Channel {
     /// Writes the raw digital data to the channel.
     /// no gurantee it can use all 32 bits, for example the `RoboRio`
@@ -35,11 +39,19 @@ pub trait AnalogOutputChannel: Channel {
     /// Returns the voltage range of the output
     fn voltage_range(&self) -> (Volt, Volt);
 }
+/// A type represting a type erased [``AnalogOutputChannel``](AnalogOutputChannel).
 pub type AnalogOutput = Box<dyn AnalogOutputChannel>;
 
 
+/// A variety of [``Channel``](super::Channel) that can read and write analog data.
 pub trait AnalogBiChannel: AnalogInputChannel + AnalogOutputChannel {}
+
+/// A type represting a type erased [``AnalogBiChannel``](AnalogBiChannel).
 pub type AnalogBi = Box<dyn AnalogBiChannel>;
+
+/// Implement [``AnalogBiChannel``](AnalogBiChannel) for all types that implement
+/// [``AnalogInputChannel``](AnalogInputChannel) and [``AnalogOutputChannel``](AnalogOutputChannel).
+impl<T: AnalogInputChannel + AnalogOutputChannel> AnalogBiChannel for T {}
 
 /// Checks if the specified port is available for analog use.
 /// Has a sensible default implementation but can be overriden if needed.
