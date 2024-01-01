@@ -6,42 +6,42 @@
 //! This library goes as far as it can to be panic free,
 //! the only function that can panic is [HAL Initialization](crate::hal::HAL).
 //! 
-//! ## Modules
-//! 
-//! ### [Value](crate::value)
-//! 
-//! This module contains the [``FrcValue``](crate::value::FrcValue) type which is used to represent values in various frc protocols.
-//! Variants:
-//! - [Void](crate::value::FrcValue::Void)
-//! - [Boolean](crate::value::FrcValue::Boolean)
-//! - [Float](crate::value::FrcValue::Float)
-//! - [Double](crate::value::FrcValue::Double)
-//! - [String](crate::value::FrcValue::String)
-//! - [Boolean Array](crate::value::FrcValue::BooleanArray)
-//! - [Float Array](crate::value::FrcValue::FloatArray)
-//! - [Double Array](crate::value::FrcValue::DoubleArray)
-//! - [String Array](crate::value::FrcValue::StringArray)
-//! - [Raw](crate::value::FrcValue::Raw)
-//! - [Struct](crate::value::FrcValue::Struct)
-//! 
-//! ### [Units](crate::units)
-//! 
-//! This module contains a variety of units and unit families with macros for user defined units.
-//! Units:
-//! - [Time](crate::units::time)
-//! - [Angle](crate::units::angle)
-//! - [Angular Velocity](crate::units::angular_velocity)
-//! - [Angular Acceleration](crate::units::angular_acceleration)
-//! - [Distance](crate::units::distance)
-//! - [Linear Velocity](crate::units::linear_velocity)
-//! - [Mass](crate::units::mass)
-//! - [Temperature](crate::units::temperature)
-//! - [Energy](crate::units::energy)
-//! - [Moment of Inertia](crate::units::moment_of_inertia)
-//! - [Torque](crate::units::torque)
-//! - [Data](crate::units::data)
-//! - [Data Rate](crate::units::data_rate)
-//! 
+// ## Modules
+// 
+// ### [Value](crate::value)
+// 
+// This module contains the [``FrcValue``](crate::value::FrcValue) type which is used to represent values in various frc protocols.
+// Variants:
+// - [Void](crate::value::FrcValue::Void)
+// - [Boolean](crate::value::FrcValue::Boolean)
+// - [Float](crate::value::FrcValue::Float)
+// - [Double](crate::value::FrcValue::Double)
+// - [String](crate::value::FrcValue::String)
+// - [Boolean Array](crate::value::FrcValue::BooleanArray)
+// - [Float Array](crate::value::FrcValue::FloatArray)
+// - [Double Array](crate::value::FrcValue::DoubleArray)
+// - [String Array](crate::value::FrcValue::StringArray)
+// - [Raw](crate::value::FrcValue::Raw)
+// - [Struct](crate::value::FrcValue::Struct)
+// 
+// ### [Units](crate::units)
+// 
+// This module contains a variety of units and unit families with macros for user defined units.
+// Units:
+// - [Time](crate::units::time)
+// - [Angle](crate::units::angle)
+// - [Angular Velocity](crate::units::angular_velocity)
+// - [Angular Acceleration](crate::units::angular_acceleration)
+// - [Distance](crate::units::distance)
+// - [Linear Velocity](crate::units::linear_velocity)
+// - [Mass](crate::units::mass)
+// - [Temperature](crate::units::temperature)
+// - [Energy](crate::units::energy)
+// - [Moment of Inertia](crate::units::moment_of_inertia)
+// - [Torque](crate::units::torque)
+// - [Data](crate::units::data)
+// - [Data Rate](crate::units::data_rate)
+// 
 
 #![deny(clippy::all, clippy::cargo, clippy::pedantic, clippy::nursery)]
 #![deny(
