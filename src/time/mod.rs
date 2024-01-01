@@ -25,26 +25,35 @@ pub fn uptime() -> Duration {
     unsafe { UPTIME_SOURCE() }.into()
 }
 
+#[derive(Debug, thiserror::Error, Clone, Copy)]
+pub enum PauseError {
+    #[error("Pause not implemented for {} time source", unsafe { IMPLEMENTATION_NAME })]
+    PauseNotImplemented,
+    #[error("Cannot pause if already paused")]
+    AlreadyPaused,
+    #[error("Cannot un-pause if not paused")]
+    NotPaused,
+}
+
 /// Pauses the time with platforms that support it
-///
-/// # Panics
-/// Panics if the time source is already paused and `should_pause` is true
-/// Panics if the time source is not paused and `should_pause` is false
-/// Panics if called and [`pause_implemented`] returns false
+/// 
+/// # Errors
+///  - [`PauseError::PauseNotImplemented`] if [`pause_implemented`] returns false
+///  - [`PauseError::AlreadyPaused`] if the [`is_paused`] is true and `should_pause` is true
+///  - [`PauseError::NotPaused`] if the [`is_paused`] is false and `should_pause` is false
 #[inline]
-pub fn pause(should_pause: bool) {
+pub fn try_pause(should_pause: bool) -> Result<(), PauseError> {
     if IS_PAUSED.swap(should_pause, atomic::Ordering::Relaxed) == should_pause {
         if should_pause {
-            panic!("Cannot pause if already paused")
+            Err(PauseError::AlreadyPaused)
         } else {
-            panic!("Cannot un-pause if not paused")
+            Err(PauseError::NotPaused)
         }
     } else if !PAUSE_IMPLEMENTED.load(atomic::Ordering::Relaxed) {
-        unimplemented!("Pause not implemented for {} time source", unsafe {
-            IMPLEMENTATION_NAME
-        })
+        Err(PauseError::PauseNotImplemented)
     } else {
         unsafe { UPTIME_PAUSE(should_pause) };
+        Ok(())
     }
 }
 
@@ -107,9 +116,7 @@ pub mod __private {
             super::UPTIME_PAUSE = pause;
         } else {
             super::PAUSE_IMPLEMENTED.store(false, Ordering::Relaxed);
-            super::UPTIME_PAUSE = |_| unimplemented!("Pause not implemented for {} time source", unsafe {
-                super::IMPLEMENTATION_NAME
-            });
+            super::UPTIME_PAUSE = |_| {};
         }
     }
 }
@@ -128,12 +135,12 @@ mod test {
 
     fn test_pause() {
         use super::*;
-        pause(true);
+        try_pause(true).expect("Pause Error");
         let start = uptime().as_micros();
         thread::sleep(Duration::from_millis(1000));
         let end = uptime().as_micros();
         assert!(end + 5 - start < 100);
-        pause(false);
+        try_pause(false).expect("Pause Error");
         thread::sleep(Duration::from_millis(1000));
         let end = uptime().as_micros();
         assert!(end - start >= 1_000_000);

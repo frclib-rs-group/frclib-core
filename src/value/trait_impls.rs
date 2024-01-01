@@ -899,39 +899,29 @@ impl TryFrom<MPValue> for FrcValue {
                     match first_type {
                         FrcType::Boolean => Ok(Self::BooleanArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                bool::try_from
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::Int => Ok(Self::IntArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                i64::try_from
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
                         )),
                         FrcType::Float => Ok(Self::FloatArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                f32::try_from
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
                         )),
                         FrcType::Double => Ok(Self::DoubleArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                f64::try_from
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
                         )),
-                        // FrcType::String => Ok(Self::StringArray(
-                        //     arr.into_iter().map(|v| v.try_into().unwrap()).collect(),
-                        // )),
+                        FrcType::String => Ok(Self::StringArray(
+                            arr.into_iter().map(
+                                |v| String::try_from(v).map(Box::from)
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
+                        )),
                         any => Err(FrcValueCastError::InvalidCastTo(
                             any,
                             stringify!(MPValue),
@@ -1026,43 +1016,28 @@ impl TryFrom<JSONValue> for FrcValue {
                     match first_type {
                         FrcType::Boolean => Ok(Self::BooleanArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                bool::try_from
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?,
                         )),
                         FrcType::Int => Ok(Self::IntArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                i64::try_from
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
                         )),
                         FrcType::Float => Ok(Self::FloatArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                f32::try_from
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
                         )),
                         FrcType::Double => Ok(Self::DoubleArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                f64::try_from
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
                         )),
                         FrcType::String => Ok(Self::StringArray(
                             arr.into_iter().map(
-                                |v| {
-                                    v.try_into()
-                                    .expect("All types in FrcValue array are not identical")
-                                }
-                        ).collect(),
+                                |v| String::try_from(v).map(Box::from)
+                            ).collect::<Result<Box<[_]>, FrcValueCastError>>()?
                         )),
                         any => Err(FrcValueCastError::InvalidCastTo(
                             any,
@@ -1098,11 +1073,11 @@ impl From<FrcValue> for JSONValue {
             }),
             FrcValue::Float(f) => Self::Number(
                 serde_json::Number::from_f64(f64::from(f))
-                    .expect("Could not serialize float to JSON number"),
+                    .unwrap_or_else(|| serde_json::Number::from(0))
             ),
             FrcValue::Double(f) => Self::Number(
                 serde_json::Number::from_f64(f)
-                    .expect("Could not serialize double to JSON number"),
+                    .unwrap_or_else(|| serde_json::Number::from(0))
             ),
             FrcValue::String(s) => Self::String(s.into()),
             FrcValue::Raw(b) => Self::Array(
@@ -1130,7 +1105,7 @@ impl From<FrcValue> for JSONValue {
                 a.iter()
                     .map(|v| Self::Number(
                         serde_json::Number::from_f64(f64::from(*v))
-                            .expect("Could not serialize float to JSON number")
+                            .unwrap_or_else(|| serde_json::Number::from(0))
                     ))
                     .collect::<Vec<Self>>(),
             ),
@@ -1138,7 +1113,7 @@ impl From<FrcValue> for JSONValue {
                 a.iter()
                     .map(|v| Self::Number(
                         serde_json::Number::from_f64(*v)
-                            .expect("Could not serialize double to JSON number")
+                            .unwrap_or_else(|| serde_json::Number::from(0))
                     ))
                     .collect::<Vec<Self>>(),
             ),

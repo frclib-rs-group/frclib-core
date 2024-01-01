@@ -67,50 +67,50 @@ fn test_structures() {
     }
 }
 
-#[test]
-fn test_schema() {
-    const SCHEMA: &str = "enum {a=1, b=2} int8 val[3]";
-    let fields = parse_schema_toplevel(SCHEMA);
-    assert_eq!(fields.len(), 1);
-    assert_eq!(
-        fields[0],
-        ("val".to_owned(), 0, StructureFieldTypes::Int8(3))
-    );
-}
+// #[test]
+// fn test_schema() {
+//     const SCHEMA: &str = "enum {a=1, b=2} int8 val[3]";
+//     let fields = parse_schema_toplevel(SCHEMA);
+//     assert_eq!(fields.len(), 1);
+//     assert_eq!(
+//         fields[0],
+//         ("val".to_owned(), 0, StructureFieldTypes::Int8(3))
+//     );
+// }
 
-#[test]
-fn test_schema_advanced() {
-    const SCHEMA: &str = "Rotation2d rot; Translation2d trans;";
-    FrcStructDescDB::add(FrcStructDesc {
-        schema_supplier: || "double value".to_owned(),
-        type_str: "Rotation2d",
-        size: 8,
-    });
-    FrcStructDescDB::add(FrcStructDesc {
-        schema_supplier: || "double x; double y".to_owned(),
-        type_str: "Translation2d",
-        size: 16,
-    });
-    let fields = parse_schema_toplevel(SCHEMA);
-    assert_eq!(fields.len(), 3);
-    assert_eq!(
-        fields,
-        vec![
-            (
-                "rot.value".to_owned(),
-                0usize,
-                StructureFieldTypes::Float64(1)
-            ),
-            (
-                "trans.x".to_owned(),
-                8usize,
-                StructureFieldTypes::Float64(1)
-            ),
-            (
-                "trans.y".to_owned(),
-                16usize,
-                StructureFieldTypes::Float64(1)
-            )
-        ]
-    );
-}
+// #[test]
+// fn test_schema_advanced() {
+//     const SCHEMA: &str = "Rotation2d rot; Translation2d trans;";
+//     FrcStructDescDB::add(FrcStructDesc {
+//         schema_supplier: || "double value".to_owned(),
+//         type_str: "Rotation2d",
+//         size: 8,
+//     });
+//     FrcStructDescDB::add(FrcStructDesc {
+//         schema_supplier: || "double x; double y".to_owned(),
+//         type_str: "Translation2d",
+//         size: 16,
+//     });
+//     let fields = parse_schema_toplevel(SCHEMA);
+//     assert_eq!(fields.len(), 3);
+//     assert_eq!(
+//         fields,
+//         vec![
+//             (
+//                 "rot.value".to_owned(),
+//                 0usize,
+//                 StructureFieldTypes::Float64(1)
+//             ),
+//             (
+//                 "trans.x".to_owned(),
+//                 8usize,
+//                 StructureFieldTypes::Float64(1)
+//             ),
+//             (
+//                 "trans.y".to_owned(),
+//                 16usize,
+//                 StructureFieldTypes::Float64(1)
+//             )
+//         ]
+//     );
+// }

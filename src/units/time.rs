@@ -21,9 +21,10 @@ unit_conversion!(Hour(float) <-> Microsecond(uint) ~ hour_to_microsecond);
 
 //TODO: This is a hack to satisfy unit family
 impl Neg for Microsecond {
-    type Output = Self;
+    type Output = Millisecond;
+    #[allow(clippy::cast_precision_loss)]
     fn neg(self) -> Self::Output {
-        unimplemented!("Negation of Microsecond not implemented")
+        Millisecond::new(-(self.value() as f64))
     }
 }
 
@@ -110,8 +111,7 @@ impl From<Duration> for Millisecond {
 
 impl From<Duration> for Microsecond {
     fn from(duration: Duration) -> Self {
-        //its ok not doing a try from here because the max value of a microsecond is 2^63-1
-        Self::new(u64::try_from(duration.as_micros()).expect("Duration too large"))
+        Self::new(u64::try_from(duration.as_micros()).unwrap_or(u64::MAX))
     }
 }
 

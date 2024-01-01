@@ -40,9 +40,7 @@ pub trait ClockDriver: 'static {
     /// ## Implementing
     /// You can assume that `should_pause` will be `true` and `false` in alternating calls
     /// due to the [`crate::time::pause`] implementation.
-    unsafe fn pause(_should_pause: bool) {
-        unimplemented!("Pause is not available on this platform")
-    }
+    unsafe fn pause(_should_pause: bool) {}
 
     /// Returns is system time is a valid source of real-world time.
     /// For platforms like the `RoboRio` this will only be true when connected DS

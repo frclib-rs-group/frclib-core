@@ -110,7 +110,6 @@ fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
             unpack = format!("{}{}: {}::unpack(buffer),", unpack, name.into_token_stream(), typ.into_token_stream());
         }
         unpack = format!("{}}}", unpack);
-        // panic!("{}", unpack);
         syn::parse_str::<syn::ExprStruct>(unpack.as_str()).expect("Failed to parse unpack expression")
     };
 
@@ -129,7 +128,7 @@ fn impl_frc_struct(ast: &syn::DeriveInput) -> TokenStream2 {
             }
         }
         frclib_core::structure::inventory::submit! { <#name as FrcStructure>::DESCRIPTION }
-        //this isnt a generic impl for every struct because of primitive and unit types
+        ///This isnt a generic impl for every struct because of primitive and unit types
         impl Into<frclib_core::value::FrcValue> for #name {
             fn into(self) -> frclib_core::value::FrcValue {
                 let mut buffer = frclib_core::structure::bytes::BytesMut::with_capacity(Self::SIZE);

@@ -4,7 +4,7 @@ mod test;
 mod prims;
 
 use bytes::{Buf, BufMut};
-use logos::Logos;
+// use logos::Logos;
 
 pub use bytes;
 pub use inventory;
@@ -89,217 +89,210 @@ where
     }
 }
 
-// #[cfg(feature = "value-union")]
-// impl<T: FrcStructure> From<T> for crate::value::FrcValue {
-//     fn from(value: T) -> Self {
-//         Self::from_struct(&value)
+// #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+// pub(crate) enum StructureFieldTypes {
+//     Bool(usize),
+//     Char(usize),
+//     Int8(usize),
+//     Int16(usize),
+//     Int32(usize),
+//     Int64(usize),
+//     UInt8(usize),
+//     UInt16(usize),
+//     UInt32(usize),
+//     UInt64(usize),
+//     Float32(usize),
+//     Float64(usize),
+// }
+
+// impl StructureFieldTypes {
+//     #[allow(clippy::match_same_arms)]
+//     const fn base_size(&self) -> usize {
+//         match self {
+//             Self::Bool(_) => 1,
+//             Self::Char(_) => 1,
+//             Self::Int8(_) => 1,
+//             Self::Int16(_) => 2,
+//             Self::Int32(_) => 4,
+//             Self::Int64(_) => 8,
+//             Self::UInt8(_) => 1,
+//             Self::UInt16(_) => 2,
+//             Self::UInt32(_) => 4,
+//             Self::UInt64(_) => 8,
+//             Self::Float32(_) => 4,
+//             Self::Float64(_) => 8,
+//         }
+//     }
+
+//     const fn count(&self) -> usize {
+//         match self {
+//             Self::Bool(c)
+//             | Self::Char(c)
+//             | Self::Int8(c)
+//             | Self::Int16(c)
+//             | Self::Int32(c)
+//             | Self::Int64(c)
+//             | Self::UInt8(c)
+//             | Self::UInt16(c)
+//             | Self::UInt32(c)
+//             | Self::UInt64(c)
+//             | Self::Float32(c)
+//             | Self::Float64(c) => *c,
+//         }
+//     }
+
+//     const fn size(&self) -> usize {
+//         self.base_size() * self.count()
+//     }
+
+//     fn from_type(type_name: &str, count: usize) -> Option<Self> {
+//         match type_name {
+//             "bool" => Some(Self::Bool(count)),
+//             "char" => Some(Self::Char(count)),
+//             "int8" => Some(Self::Int8(count)),
+//             "int16" => Some(Self::Int16(count)),
+//             "int32" => Some(Self::Int32(count)),
+//             "int64" => Some(Self::Int64(count)),
+//             "uint8" => Some(Self::UInt8(count)),
+//             "uint16" => Some(Self::UInt16(count)),
+//             "uint32" => Some(Self::UInt32(count)),
+//             "uint64" => Some(Self::UInt64(count)),
+//             "float" | "float32" => Some(Self::Float32(count)),
+//             "double" | "float64" => Some(Self::Float64(count)),
+//             _ => None,
+//         }
 //     }
 // }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(crate) enum StructureFieldTypes {
-    Bool(usize),
-    Char(usize),
-    Int8(usize),
-    Int16(usize),
-    Int32(usize),
-    Int64(usize),
-    UInt8(usize),
-    UInt16(usize),
-    UInt32(usize),
-    UInt64(usize),
-    Float32(usize),
-    Float64(usize),
-}
+// #[derive(Default, Debug, Clone, PartialEq)]
+// pub(crate) enum LexingError {
+//     ParseNumberError,
+//     EnumVariantError,
+//     #[default]
+//     Other,
+// }
+// impl From<std::num::ParseIntError> for LexingError {
+//     fn from(_: std::num::ParseIntError) -> Self {
+//         Self::ParseNumberError
+//     }
+// }
 
-impl StructureFieldTypes {
-    #[allow(clippy::match_same_arms)]
-    const fn base_size(&self) -> usize {
-        match self {
-            Self::Bool(_) => 1,
-            Self::Char(_) => 1,
-            Self::Int8(_) => 1,
-            Self::Int16(_) => 2,
-            Self::Int32(_) => 4,
-            Self::Int64(_) => 8,
-            Self::UInt8(_) => 1,
-            Self::UInt16(_) => 2,
-            Self::UInt32(_) => 4,
-            Self::UInt64(_) => 8,
-            Self::Float32(_) => 4,
-            Self::Float64(_) => 8,
-        }
-    }
+// #[derive(logos::Logos, Debug, PartialEq, Eq, PartialOrd, Ord)]
+// #[logos(error = LexingError)]
+// #[logos(skip r"[ \t\n\f]+")]
+// pub(crate) enum Token<'a> {
+//     #[regex(
+//         r"bool|char|int8|int16|int32|int64|uint8|uint16|uint32|uint64|float32|float64|float|double",
+//         |lex| lex.slice(), priority = 3)]
+//     TypeName(&'a str),
 
-    const fn count(&self) -> usize {
-        match self {
-            Self::Bool(c)
-            | Self::Char(c)
-            | Self::Int8(c)
-            | Self::Int16(c)
-            | Self::Int32(c)
-            | Self::Int64(c)
-            | Self::UInt8(c)
-            | Self::UInt16(c)
-            | Self::UInt32(c)
-            | Self::UInt64(c)
-            | Self::Float32(c)
-            | Self::Float64(c) => *c,
-        }
-    }
+//     #[token("enum")]
+//     EnumKeyword,
 
-    const fn size(&self) -> usize {
-        self.base_size() * self.count()
-    }
+//     #[regex(
+//         r"[-a-zA-Z_][a-zA-Z0-9_-]*=-?[0-9]+",
+//         |lex| {
+//             let split = lex.slice().split('=').collect::<Vec<_>>();
+//             Ok::<_, LexingError>((
+//                 *split.first().ok_or(LexingError::EnumVariantError)?,
+//                 split.get(1).ok_or(LexingError::EnumVariantError)?.parse::<i8>()?
+//             ))
+//         }, priority = 3)]
+//     EnumVariant((&'a str, i8)),
 
-    fn from_type(type_name: &str, count: usize) -> Option<Self> {
-        match type_name {
-            "bool" => Some(Self::Bool(count)),
-            "char" => Some(Self::Char(count)),
-            "int8" => Some(Self::Int8(count)),
-            "int16" => Some(Self::Int16(count)),
-            "int32" => Some(Self::Int32(count)),
-            "int64" => Some(Self::Int64(count)),
-            "uint8" => Some(Self::UInt8(count)),
-            "uint16" => Some(Self::UInt16(count)),
-            "uint32" => Some(Self::UInt32(count)),
-            "uint64" => Some(Self::UInt64(count)),
-            "float" | "float32" => Some(Self::Float32(count)),
-            "double" | "float64" => Some(Self::Float64(count)),
-            _ => None,
-        }
-    }
-}
+//     #[regex(r"[0-9]+", |lex| lex.slice().parse(), priority = 2)]
+//     Integer(u32),
 
-#[derive(Default, Debug, Clone, PartialEq)]
-pub(crate) enum LexingError {
-    ParseNumberError,
-    EnumVariantError,
-    #[default]
-    Other,
-}
-impl From<std::num::ParseIntError> for LexingError {
-    fn from(_: std::num::ParseIntError) -> Self {
-        Self::ParseNumberError
-    }
-}
+//     #[regex(r"[-a-zA-Z_][a-zA-Z0-9_-]*", |lex| lex.slice())]
+//     Ident(&'a str),
 
-#[derive(logos::Logos, Debug, PartialEq, Eq, PartialOrd, Ord)]
-#[logos(error = LexingError)]
-#[logos(skip r"[ \t\n\f]+")]
-pub(crate) enum Token<'a> {
-    #[regex(
-        r"bool|char|int8|int16|int32|int64|uint8|uint16|uint32|uint64|float32|float64|float|double",
-        |lex| lex.slice(), priority = 3)]
-    TypeName(&'a str),
+//     #[token("{")]
+//     OpenBrace,
+//     #[token("}")]
+//     CloseBrace,
+//     #[token("[")]
+//     OpenBracket,
+//     #[token("]")]
+//     CloseBracket,
+//     #[token(",")]
+//     Comma,
+//     #[token(";")]
+//     Semicolon,
+//     #[token(":")]
+//     Colon,
+// }
 
-    #[token("enum")]
-    EnumKeyword,
+// #[allow(dead_code)]
+// pub(crate) fn parse_schema_toplevel(
+//     schema: &str,
+// ) -> Vec<(String, usize, StructureFieldTypes)> {
+//     parse_schema(schema, "", 0)
+// }
 
-    #[regex(
-        r"[-a-zA-Z_][a-zA-Z0-9_-]*=-?[0-9]+",
-        |lex| {
-            let split = lex.slice().split('=').collect::<Vec<_>>();
-            Ok::<_, LexingError>((
-                *split.first().ok_or(LexingError::EnumVariantError)?,
-                split.get(1).ok_or(LexingError::EnumVariantError)?.parse::<i8>()?
-            ))
-        }, priority = 3)]
-    EnumVariant((&'a str, i8)),
+// #[allow(dead_code)]
+// pub(crate) fn parse_schema(
+//     schema: &str,
+//     prefix: &str,
+//     offset: usize,
+// ) -> Vec<(String, usize, StructureFieldTypes)> {
+//     let lexer = Token::lexer(schema);
+//     let tokens_collect: Vec<_> = lexer.collect();
+//     for tok in &tokens_collect {
+//         if tok.is_err() {
+//             return vec![];
+//         }
+//     }
+//     let tokens = tokens_collect.into_iter();
+//     let mut cursor = offset;
+//     tokens
+//         .map(|token| token.expect("Lexing Token Slipped Past"))
+//         .filter(|token| {
+//             matches!(
+//                 token,
+//                 Token::Ident(_) | Token::Integer(_) | Token::TypeName(_) | Token::Semicolon
+//             )
+//         })
+//         .collect::<Vec<_>>()
+//         .split(|token| token == &Token::Semicolon)
+//         .filter_map(|field_tokens| {
+//             if field_tokens.len() < 2 || field_tokens.len() > 3 {
+//                 return None;
+//             }
 
-    #[regex(r"[0-9]+", |lex| lex.slice().parse(), priority = 2)]
-    Integer(u32),
+//             let Token::Ident(ident) = field_tokens[1] else {
+//                 return None;
+//             };
 
-    #[regex(r"[-a-zA-Z_][a-zA-Z0-9_-]*", |lex| lex.slice())]
-    Ident(&'a str),
-
-    #[token("{")]
-    OpenBrace,
-    #[token("}")]
-    CloseBrace,
-    #[token("[")]
-    OpenBracket,
-    #[token("]")]
-    CloseBracket,
-    #[token(",")]
-    Comma,
-    #[token(";")]
-    Semicolon,
-    #[token(":")]
-    Colon,
-}
-
-#[allow(dead_code)]
-pub(crate) fn parse_schema_toplevel(
-    schema: &str,
-) -> Vec<(String, usize, StructureFieldTypes)> {
-    parse_schema(schema, "", 0)
-}
-
-#[allow(dead_code)]
-pub(crate) fn parse_schema(
-    schema: &str,
-    prefix: &str,
-    offset: usize,
-) -> Vec<(String, usize, StructureFieldTypes)> {
-    let lexer = Token::lexer(schema);
-    let tokens_collect: Vec<_> = lexer.collect();
-    for tok in &tokens_collect {
-        if tok.is_err() {
-            return vec![];
-        }
-    }
-    let tokens = tokens_collect.into_iter();
-    let mut cursor = offset;
-    tokens
-        .map(|token| token.expect("Lexing Token Slipped Past"))
-        .filter(|token| {
-            matches!(
-                token,
-                Token::Ident(_) | Token::Integer(_) | Token::TypeName(_) | Token::Semicolon
-            )
-        })
-        .collect::<Vec<_>>()
-        .split(|token| token == &Token::Semicolon)
-        .filter_map(|field_tokens| {
-            if field_tokens.len() < 2 || field_tokens.len() > 3 {
-                return None;
-            }
-
-            let Token::Ident(ident) = field_tokens[1] else {
-                return None;
-            };
-
-            match field_tokens[0] {
-                Token::Ident(sub_struct) => {
-                    if let Some(desc) = FrcStructDescDB::get(sub_struct) {
-                        let ret = parse_schema(
-                            &(desc.schema_supplier)(),
-                            format!("{ident}.").as_str(),
-                            cursor,
-                        );
-                        cursor += desc.size;
-                        return Some(ret);
-                    }
-                }
-                Token::TypeName(type_name) => {
-                    let count = match field_tokens.get(2) {
-                        Some(Token::Integer(int)) => *int as usize,
-                        _ => 1,
-                    };
-                    if let Some(stype) = StructureFieldTypes::from_type(type_name, count) {
-                        let ret = vec![(format!("{prefix}{ident}"), cursor, stype)];
-                        cursor += stype.size();
-                        return Some(ret);
-                    }
-                }
-                _ => {}
-            }
-            None::<Vec<(String, usize, StructureFieldTypes)>>
-        })
-        .flatten()
-        .collect()
-}
+//             match field_tokens[0] {
+//                 Token::Ident(sub_struct) => {
+//                     if let Some(desc) = FrcStructDescDB::get(sub_struct) {
+//                         let ret = parse_schema(
+//                             &(desc.schema_supplier)(),
+//                             format!("{ident}.").as_str(),
+//                             cursor,
+//                         );
+//                         cursor += desc.size;
+//                         return Some(ret);
+//                     }
+//                 }
+//                 Token::TypeName(type_name) => {
+//                     let count = match field_tokens.get(2) {
+//                         Some(Token::Integer(int)) => *int as usize,
+//                         _ => 1,
+//                     };
+//                     if let Some(stype) = StructureFieldTypes::from_type(type_name, count) {
+//                         let ret = vec![(format!("{prefix}{ident}"), cursor, stype)];
+//                         cursor += stype.size();
+//                         return Some(ret);
+//                     }
+//                 }
+//                 _ => {}
+//             }
+//             None::<Vec<(String, usize, StructureFieldTypes)>>
+//         })
+//         .flatten()
+//         .collect()
+// }
 
 // pub struct DynamicStructure {
 //     desc: &'static FrcStructDesc,

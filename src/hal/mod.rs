@@ -117,9 +117,7 @@ impl HAL {
     fn set_hal(self) {
         #[cfg(not(test))]
         {
-            HAL_INSTANCE
-                .set(self)
-                .expect("HAL has already been initialized or was initialized in another thread");
+            let _ = HAL_INSTANCE.set(self);
         }
         #[cfg(test)]
         {
@@ -169,21 +167,29 @@ impl HAL {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct HALNotInitializedError;
+impl std::fmt::Display for HALNotInitializedError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "`HAL` has not been initialized")
+    }
+}
+impl std::error::Error for HALNotInitializedError {}
+
 /// Returns the current [`HAL`] instance.
-///
-/// # Panics
-/// If HAL has not been initialized this will panic
-#[must_use]
-pub fn get_hal() -> HAL {
+/// 
+/// # Errors
+///  - [`HALNotInitializedError`] if the [`HAL`] has not been initialized
+pub fn get_hal() -> Result<HAL, HALNotInitializedError> {
     #[cfg(not(test))]
     {
-        *HAL_INSTANCE.get().expect("HAL has not been initialized")
+        HAL_INSTANCE.get().copied().ok_or(HALNotInitializedError)
     }
     #[cfg(test)]
     {
         HAL_INSTANCE_LOCAL.with(|local_hal_instance| {
-            (*local_hal_instance.borrow()).expect("HAL has not been initialized")
-        })
+            *local_hal_instance.borrow()
+        }).ok_or(HALNotInitializedError)
     }
 }
 

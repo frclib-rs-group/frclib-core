@@ -1,4 +1,4 @@
-
+pub use tracing_unwrap::ResultExt as _;
 trait ResultExt<T, E>: tracing_unwrap::ResultExt<T, E> + Sized {
     ///Consumes the result and logs the error if it is `Err`.
     /// 
