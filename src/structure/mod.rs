@@ -117,6 +117,10 @@ where
     }
 }
 
+
+/// A set length string of characters
+pub type StructString<const N: usize> = [char; N];
+
 // #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 // pub(crate) enum StructureFieldTypes {
 //     Bool(usize),

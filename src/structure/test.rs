@@ -3,10 +3,10 @@ use bytes::{Buf, BufMut};
 use super::*;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
-struct Meter {
+struct SubStruct {
     value: f64,
 }
-impl FrcStructure for Meter {
+impl FrcStructure for SubStruct {
     const TYPE: &'static str = "Meter";
     const SIZE: usize = 8;
     const SCHEMA_SUPPLIER: fn() -> String = || "float64 value".to_owned();
@@ -22,7 +22,7 @@ impl FrcStructure for Meter {
     }
 }
 
-inventory::submit! { Meter::DESCRIPTION }
+inventory::submit! { SubStruct::DESCRIPTION }
 
 #[test]
 #[cfg(feature = "value-union")]
@@ -30,18 +30,28 @@ fn test_structures() {
     use crate as frclib_core;
     use crate::value::FrcValue;
 
+    #[derive(Debug, PartialEq, Clone, Copy, FrcStructure, Default)]
+    #[repr(u8)]
+    enum MyEnum {
+        #[default]
+        A,
+        B,
+        C = 100
+    }
+
     #[derive(Debug, PartialEq, Clone, Copy, FrcStructure)]
     struct NestedTestStruct {
+        enum_val: MyEnum,
         boolean: bool,
-        test_struct: Meter,
-        test_struct_arr: [Meter; 2],
+        test_struct: SubStruct,
+        test_struct_arr: [SubStruct; 2],
         integer: i32,
         string: [char; 128],
     }
 
-    let test_struct = Meter { value: 1.0 };
+    let test_struct = SubStruct { value: 1.0 };
     let value = FrcValue::from_struct(&test_struct);
-    let test_struct2: Meter = value.try_into_struct().expect("Failed to convert");
+    let test_struct2: SubStruct = value.try_into_struct().expect("Failed to convert");
     assert_eq!(test_struct, test_struct2);
 
     let nested_struct = NestedTestStruct {
@@ -50,6 +60,7 @@ fn test_structures() {
         test_struct_arr: [test_struct; 2],
         integer: 1,
         string: ['a'; 128],
+        enum_val: MyEnum::B,
     };
     let value = FrcValue::from_struct(&nested_struct);
     let nested_struct2: NestedTestStruct = value.try_into_struct().expect("Failed to convert");
