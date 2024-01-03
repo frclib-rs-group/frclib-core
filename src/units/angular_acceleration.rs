@@ -1,19 +1,18 @@
 use crate::{unit, unit_conversion, unit_family};
 
-unit!(DegreePerSecondSquared: float);
-unit!(RadianPerSecondSquared: float);
-unit!(RotationPerSecondSquared: float);
-unit!(RotationPerMinuteSquared: float);
+unit!(DegreePerSecSqr: float);
+unit!(RadianPerSecSqr: float);
+unit!(RotationPerSecSqr: float);
+unit!(RotationPerMinSqr: float);
 
-unit_conversion!(DegreePerSecondSquared(float) <-> RadianPerSecondSquared(float) ~ degree_per_second_squared_to_radian_per_second_squared);
-unit_conversion!(DegreePerSecondSquared(float) <-> RotationPerSecondSquared(float) ~ degree_per_second_squared_to_rotation_per_second_squared);
-unit_conversion!(DegreePerSecondSquared(float) <-> RotationPerMinuteSquared(float) ~ degree_per_second_squared_to_rotation_per_minute_squared);
-unit_conversion!(RadianPerSecondSquared(float) <-> RotationPerSecondSquared(float) ~ radian_per_second_squared_to_rotation_per_second_squared);
-unit_conversion!(RadianPerSecondSquared(float) <-> RotationPerMinuteSquared(float) ~ radian_per_second_squared_to_rotation_per_minute_squared);
-unit_conversion!(RotationPerSecondSquared(float) <-> RotationPerMinuteSquared(float) ~ rotation_per_second_squared_to_rotation_per_minute_squared);
+unit_conversion!(DegreePerSecSqr(float) <-> RadianPerSecSqr(float) ~ degree_per_second_squared_to_radian_per_second_squared);
+unit_conversion!(DegreePerSecSqr(float) <-> RotationPerSecSqr(float) ~ degree_per_second_squared_to_rotation_per_second_squared);
+unit_conversion!(DegreePerSecSqr(float) <-> RotationPerMinSqr(float) ~ degree_per_second_squared_to_rotation_per_minute_squared);
+unit_conversion!(RadianPerSecSqr(float) <-> RotationPerSecSqr(float) ~ radian_per_second_squared_to_rotation_per_second_squared);
+unit_conversion!(RadianPerSecSqr(float) <-> RotationPerMinSqr(float) ~ radian_per_second_squared_to_rotation_per_minute_squared);
+unit_conversion!(RotationPerSecSqr(float) <-> RotationPerMinSqr(float) ~ rotation_per_second_squared_to_rotation_per_minute_squared);
 
-// unit_family!(AngularAccel: DegreePerSecondSquared RadianPerSecondSquared RotationPerSecondSquared RotationPerMinuteSquared);
-unit_family!(AngleAccel(RadianPerSecondSquared): DegreePerSecondSquared, RotationPerSecondSquared, RotationPerMinuteSquared);
+unit_family!(AngleAccel(RadianPerSecSqr): DegreePerSecSqr, RotationPerSecSqr, RotationPerMinSqr);
 
 fn degree_per_second_squared_to_radian_per_second_squared(degree_per_second_squared: f64) -> f64 {
     degree_per_second_squared.to_radians()

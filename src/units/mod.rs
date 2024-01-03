@@ -39,32 +39,22 @@
 //!   }
 //! }
 
-/// Angle units
+#![allow(missing_docs)]
+
 pub mod angle;
-/// Angular acceleration units
-pub mod angular_acceleration;
-/// Angular velocity units
 pub mod angular_velocity;
-/// Data units
+pub mod angular_acceleration;
 pub mod data;
-/// Data rate units
 pub mod data_rate;
-/// Distance units
-pub mod distance;
-/// Energy units
-pub mod energy;
-/// Force units
+pub mod length;
 pub mod linear_velocity;
-/// Linear acceleration units
+pub mod linear_acceleration;
+pub mod energy;
 pub mod mass;
-/// Linear velocity units
 pub mod moment_of_inertia;
-/// Mass units
 pub mod temperature;
-/// Moment of inertia units
-pub mod time;
-/// Temperature units
 pub mod torque;
+pub mod time;
 
 #[doc(hidden)]
 pub mod macros;

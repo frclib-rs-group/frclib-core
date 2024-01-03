@@ -1,5 +1,5 @@
 use crate::units::{
-    distance::{Foot, Meter},
+    length::{Foot, Meter},
     linear_velocity::MetersPerSecond,
     time::Second,
 };

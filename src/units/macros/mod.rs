@@ -23,7 +23,7 @@ macro_rules! unit {
     ($unit_name:ident : float) => {
         /// A unit of measurement.
         /// This is a newtype wrapper around a [`f64`].
-        #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+        #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
         pub struct $unit_name(pub f64);
 
         impl std::hash::Hash for $unit_name {
@@ -59,7 +59,7 @@ macro_rules! unit {
     ($unit_name:ident : int) => {
         /// A unit of measurement.
         /// This is a newtype wrapper around a [`i64`].
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
         pub struct $unit_name(pub i64);
 
         impl $unit_name {
@@ -89,7 +89,7 @@ macro_rules! unit {
     ($unit_name:ident : uint) => {
         /// A unit of measurement.
         /// This is a newtype wrapper around a [`u64`].
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
         pub struct $unit_name(pub u64);
 
         impl $unit_name {
@@ -212,7 +212,7 @@ macro_rules! unit_family {
                 $(
                     #[doc = "Converts this unit to `" $unit_name "`."]
                     #[inline]
-                    fn [<to_ $unit_name:lower>](self) -> $unit_name {
+                    fn [<to_ $unit_name:lower s>](self) -> $unit_name {
                         $unit_name::from(self.standard())
                     }
                 )*
@@ -220,7 +220,7 @@ macro_rules! unit_family {
                 #[doc = "Converts this unit to `" $standard "`."]
                 #[doc = "This is the same as [`standard`](#method.standard)." ]
                 #[inline]
-                fn [<to_ $standard:lower>](self) -> $standard {
+                fn [<to_ $standard:lower s>](self) -> $standard {
                     self.standard()
                 }
             }
