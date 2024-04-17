@@ -175,7 +175,7 @@ macro_rules! unit_integer {
                 Self(num::Integer::next_multiple_of(&self.0, &other.0))
             }
             fn divides(&self, other: &Self) -> bool {
-                num::Integer::divides(&self.0, &other.0)
+                num::Integer::is_multiple_of(&self.0, &other.0)
             }
             fn is_multiple_of(&self, other: &Self) -> bool {
                 num::Integer::is_multiple_of(&self.0, &other.0)
@@ -274,7 +274,7 @@ macro_rules! unit_uinteger {
                 Self(num::Integer::next_multiple_of(&self.0, &other.0))
             }
             fn divides(&self, other: &Self) -> bool {
-                num::Integer::divides(&self.0, &other.0)
+                num::Integer::is_multiple_of(&self.0, &other.0)
             }
             fn is_multiple_of(&self, other: &Self) -> bool {
                 num::Integer::is_multiple_of(&self.0, &other.0)

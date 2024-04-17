@@ -31,7 +31,7 @@ static HAL_INSTANCE: OnceLock<HAL> = OnceLock::new();
 
 #[cfg(test)]
 thread_local! {
-    static HAL_INSTANCE_LOCAL: RefCell<Option<HAL>> = RefCell::new(None);
+    static HAL_INSTANCE_LOCAL: RefCell<Option<HAL>> = const { RefCell::new(None) };
 }
 
 /// A trait that defines a HAL(Hardware Abstraction Layer) Driver.

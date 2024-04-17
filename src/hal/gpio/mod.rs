@@ -38,7 +38,7 @@ pub enum GPIOError {
 
 /// A trait for a GPIO channel.
 pub trait Channel {
-    ///
+    /// The id the channel is opened on
     fn channel_id(&self) -> u8;
 }
 

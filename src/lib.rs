@@ -45,6 +45,7 @@
 
 #![deny(clippy::all, clippy::pedantic, clippy::nursery)]
 #![deny(
+    warnings,
     missing_copy_implementations,
     single_use_lifetimes,
     variant_size_differences,
@@ -56,7 +57,6 @@
     unused_results,
     unused_lifetimes,
     unused_unsafe,
-    unused_tuple_struct_fields,
     useless_ptr_null_checks,
     cenum_impl_drop_cast,
     while_true,
@@ -77,7 +77,8 @@
     clippy::missing_safety_doc,
     clippy::missing_asserts_for_indexing,
     clippy::missing_assert_message,
-    clippy::possible_missing_comma
+    clippy::possible_missing_comma,
+    deprecated
 )]
 #![allow(clippy::module_name_repetitions, clippy::option_if_let_else)]
 #![cfg_attr(
