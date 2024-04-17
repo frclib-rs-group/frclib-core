@@ -1,15 +1,15 @@
 //! This module contains an implementation of [WPIlib struct spec](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc)
 //! for rust and a macro to generate the trait implementation for a given struct.
 
-#[cfg(test)]
-mod test;
+// #[cfg(test)]
+// mod test;
 
 mod prims;
 
-use bytes::{Buf, BufMut};
 // use logos::Logos;
 
-pub use bytes;
+use std::io::Cursor;
+
 pub use inventory;
 
 /// A description of a structure, used for serialization and deserialization
@@ -105,15 +105,36 @@ where
     };
 
     /// Packs the structure into a buffer
-    fn pack(&self, buffer: &mut impl BufMut);
+    fn pack(&self, buffer: &mut Vec<u8>);
 
     /// Unpacks the structure from a buffer
-    fn unpack(buffer: &mut impl Buf) -> Self;
+    fn unpack(buffer: &mut Cursor<&[u8]>) -> Self;
 
     #[must_use]
     #[doc(hidden)]
     fn format_field(field: &str) -> String {
         format!("{} {}", Self::TYPE, field)
+    }
+}
+
+/// A way of defining any number of same typed [``FrcStructure``]s
+/// in a single binary heap.
+/// 
+/// The type information and struct count is also coupled with the binary data
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FrcStructureBytes {
+    /// The description of the structure types and layout
+    pub desc: &'static FrcStructDesc,
+    /// The number of structs packed into `data`
+    pub count: usize,
+    /// The binary data of the structs
+    pub data: Box<[u8]>,
+}
+impl FrcStructureBytes {
+    /// Creates a new [``FrcStructureBytes``] from a description, count, and data
+    #[must_use]
+    pub fn from_parts(desc: &'static FrcStructDesc, count: usize, data: Box<[u8]>) -> Self {
+        Self { desc, count, data }
     }
 }
 

@@ -1,4 +1,3 @@
-use bytes::{Buf, BufMut};
 
 use super::*;
 
@@ -11,11 +10,11 @@ impl FrcStructure for SubStruct {
     const SIZE: usize = 8;
     const SCHEMA_SUPPLIER: fn() -> String = || "float64 value".to_owned();
 
-    fn pack(&self, buffer: &mut impl BufMut) {
+    fn pack(&self, buffer: &mut Vec<u8>) {
         self.value.pack(buffer);
     }
 
-    fn unpack(buffer: &mut impl Buf) -> Self {
+    fn unpack(buffer: &[u8]) -> Self {
         Self {
             value: <f64 as FrcStructure>::unpack(buffer),
         }

@@ -19,7 +19,6 @@ readme = "README.md"
 serde = { version = "1.0", features = ["derive"], optional = true}
 rmpv = { version = "1.0", optional = true}
 serde_json = { version = "1.0", optional = true}
-bytes = { version = "1.5.0", features = ["serde"], optional = true}
 thiserror = { version = "1.0.50" }
 inventory = { version = "0.3.13", optional = true}
 logos = { version = "0.13.0", optional = true}
@@ -34,7 +33,7 @@ paste = { version = "1.0.14", optional = true }
 approx = "0.5.1"
 
 [features]
-structure = ["bytes", "inventory", "logos", "frclib-structure-macros"]
+structure = ["inventory", "logos", "frclib-structure-macros"]
 value-union = ["structure", "serde", "rmpv", "serde_json"]
 units = ["num", "nalgebra", "simba", "serde", "paste"]
 time = ["ctor"]
@@ -55,7 +54,8 @@ features = ["full"]
 
 [workspace]
 members = [
-    "frclib-structure-macros"
+    "frclib-structure-macros",
+    "frclib-unit-func-macros"
 ]
 resolver = "2"
 

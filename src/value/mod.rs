@@ -1,13 +1,8 @@
 //! This module contains the [``FrcValue``](crate::value::FrcValue) type which is used to represent values in various frc protocols.
 
 use std::{
-    fmt::Display,
-    hash::{Hash, Hasher},
+    fmt::Display, hash::{Hash, Hasher}, io::Cursor
 };
-
-use bytes::{Bytes, BytesMut};
-// use protobuf::descriptor::FileDescriptorProto;
-use serde::{Deserialize, Serialize};
 
 mod error;
 #[cfg(test)]
@@ -15,16 +10,16 @@ mod test;
 mod trait_impls;
 mod traits;
 
-use crate::structure::{FrcStructDesc, FrcStructure};
+use crate::structure::{FrcStructure, FrcStructureBytes};
 pub use error::FrcValueCastError;
 pub use traits::IntoFrcValue;
 
-pub use bytes;
 pub use inventory;
 
 use self::error::CastErrorReason;
 
-/// Measured in microseconds <p>
+/// Measured in microseconds
+/// 
 /// depending on source can be from unix epoch or some arbitrary start time
 pub type FrcTimestamp = u64;
 
@@ -32,6 +27,7 @@ pub type FrcTimestamp = u64;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FrcType {
     Void,
+    Raw,
     Boolean,
     Int,
     Double,
@@ -42,8 +38,8 @@ pub enum FrcType {
     FloatArray,
     DoubleArray,
     StringArray,
-    Raw,
-    Struct(&'static str),
+    Struct,
+    StructArray,
 }
 impl Display for FrcType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -60,62 +56,21 @@ impl Display for FrcType {
             Self::DoubleArray => write!(f, "DoubleArray"),
             Self::StringArray => write!(f, "StringArray"),
             Self::Raw => write!(f, "Raw"),
-            Self::Struct(name) => write!(f, "Struct({})", *name),
+            Self::Struct => write!(f, "Struct"),
+            Self::StructArray => write!(f, "StructArray"),
         }
     }
 }
 
-impl Serialize for FrcType {
-    fn serialize<S>(
-        &self,
-        serializer: S,
-    ) -> Result<<S as serde::Serializer>::Ok, <S as serde::Serializer>::Error>
-    where
-        S: serde::Serializer,
-    {
-        if let Self::Struct(name) = self {
-            serializer.serialize_str(format!("struct({})", *name).as_str())
-        } else {
-            serializer.serialize_str(&self.to_string().to_lowercase().replace("array", "[]"))
-        }
-    }
-}
-
-impl<'a> Deserialize<'a> for FrcType {
-    fn deserialize<D>(deserializer: D) -> Result<Self, <D as serde::Deserializer<'a>>::Error>
-    where
-        D: serde::Deserializer<'a>,
-    {
-        let s = String::deserialize(deserializer)?;
-        #[allow(clippy::match_same_arms)]
-        match s.as_str() {
-            "boolean" => Ok(Self::Boolean),
-            "int" => Ok(Self::Int),
-            "double" => Ok(Self::Double),
-            "float" => Ok(Self::Float),
-            "string" => Ok(Self::String),
-            "json" => Ok(Self::String),
-            "bool[]" => Ok(Self::BoolArray),
-            "int[]" => Ok(Self::IntArray),
-            "float[]" => Ok(Self::FloatArray),
-            "double[]" => Ok(Self::DoubleArray),
-            "string[]" => Ok(Self::StringArray),
-            "raw" => Ok(Self::Raw),
-            "rpc" => Ok(Self::Raw),
-            "msgpack" => Ok(Self::Raw),
-            // _ if s.starts_with("struct(") && s.ends_with(')') => {
-            //     Ok(Self::Struct(&s[7..s.len() - 1]))
-            // }
-            _ => Err(serde::de::Error::custom(format!("Invalid FrcType: {s}"))),
-        }
-    }
-}
+type BoxVec<T> = Box<[T]>;
+type BoxStr = Box<str>;
 
 /// A stardized value type for FRC data piping
 ///
 /// This enum is used to represent all possible values that can be sent over the FRC data piping system
 /// including
 /// - ``Void``
+/// - ``Raw``
 /// - ``Boolean``
 /// - ``Int``
 /// - ``Double``
@@ -126,30 +81,38 @@ impl<'a> Deserialize<'a> for FrcType {
 /// - ``FloatArray``
 /// - ``DoubleArray``
 /// - ``StringArray``
-/// - ``Raw``
 /// - ``Struct``
-///
-/// Struct is a special type that carries metadata to allow decoding into their inner type or a dynamic object
-///
-/// Bytes are Boxed to keep the size of the enum small
+/// - ``StructArray``
 #[allow(missing_docs)]
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-#[serde(untagged)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum FrcValue {
+    /// A value representing nothing, most api's that accept [`FrcValue`]
+    /// simply ignore this variant but it is important for full compatability
+    /// with things like json and messagepack
     Void,
+    /// An immutable contigous chunk of bytes
+    Raw(BoxVec<u8>),
+    /// A single boolean
     Boolean(bool),
+    /// A signed 64bit integer, this is the only integer available due to the limitations
+    /// of some parts of the wpilib ecosystem
     Int(i64),
     Double(f64),
     Float(f32),
     String(Box<str>),
-    BooleanArray(Box<[bool]>),
-    IntArray(Box<[i64]>),
-    FloatArray(Box<[f32]>),
-    DoubleArray(Box<[f64]>),
-    StringArray(Box<[Box<str>]>),
-    Raw(Box<Bytes>),
-    #[serde(skip_deserializing)]
-    Struct(#[serde(skip)] &'static FrcStructDesc, Box<Bytes>),
+    BooleanArray(BoxVec<bool>),
+    IntArray(BoxVec<i64>),
+    FloatArray(BoxVec<f32>),
+    DoubleArray(BoxVec<f64>),
+    /// A contigous immutable list of heap allocated strings,
+    /// this variant uses the most heap allocations and should be avoided if possible
+    StringArray(BoxVec<BoxStr>),
+    /// A single struct represented by a contigous chunk of bytes and a schema.
+    /// The bytes are stored behind nested boxes to try and keep the enum size small
+    Struct(Box<FrcStructureBytes>),
+    /// A list of structs represented by a contigous chunk of bytes, a schema and count.
+    /// The bytes are stored behind nested boxes to try and keep the enum size small
+    StructArray(Box<FrcStructureBytes>),
 }
 impl Display for FrcValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -166,7 +129,8 @@ impl Display for FrcValue {
             Self::DoubleArray(v) => write!(f, "{v:?}"),
             Self::StringArray(v) => write!(f, "{v:?}"),
             Self::Raw(v) => write!(f, "{v:?}"),
-            Self::Struct(desc, data) => write!(f, "Struct({}):{:?}", desc.type_str, data),
+            Self::Struct(bytes) => write!(f, "Struct({}):{:?}", bytes.desc.type_str, bytes.data),
+            Self::StructArray(bytes) => write!(f, "Struct({})[{}]:{:?}", bytes.desc.type_str, bytes.count, bytes.data),
         }
     }
 }
@@ -185,10 +149,11 @@ impl Hash for FrcValue {
             Self::DoubleArray(v) => v.iter().for_each(|v| v.to_bits().hash(state)),
             Self::StringArray(v) => v.hash(state),
             Self::Raw(v) => v.hash(state),
-            Self::Struct(desc, data) => {
-                desc.schema_supplier.hash(state);
-                desc.type_str.hash(state);
-                data.hash(state);
+            Self::Struct(bytes)
+            | Self::StructArray(bytes) => {
+                bytes.desc.schema_supplier.hash(state);
+                bytes.desc.type_str.hash(state);
+                bytes.data.hash(state);
             }
         }
     }
@@ -210,7 +175,8 @@ impl FrcValue {
             Self::DoubleArray(_) => FrcType::DoubleArray,
             Self::StringArray(_) => FrcType::StringArray,
             Self::Raw(_) => FrcType::Raw,
-            Self::Struct(desc, _) => FrcType::Struct(desc.type_str),
+            Self::Struct(_) => FrcType::Struct,
+            Self::StructArray(_) => FrcType::StructArray,
         }
     }
     ///Creates an empty Binary
@@ -229,7 +195,8 @@ impl FrcValue {
             Self::DoubleArray(v) => v.is_empty(),
             Self::FloatArray(v) => v.is_empty(),
             Self::StringArray(v) => v.is_empty(),
-            Self::Raw(v) | Self::Struct(_, v) => v.is_empty(),
+            Self::Raw(v) => v.is_empty(),
+            Self::Struct(bytes) | Self::StructArray(bytes) => bytes.data.is_empty(),
             _ => false,
         }
     }
@@ -243,6 +210,7 @@ impl FrcValue {
                 | Self::DoubleArray(_)
                 | Self::FloatArray(_)
                 | Self::StringArray(_)
+                | Self::StructArray(_)
         )
     }
     /// Consumes itself to a timestamped value with the given timestamp
@@ -250,24 +218,12 @@ impl FrcValue {
     pub const fn to_timestamped(self, timestamp: FrcTimestamp) -> FrcTimestampedValue {
         FrcTimestampedValue::new(timestamp, self)
     }
-    /// Clones itself to a timestamped value with the given timestamp
-    #[must_use]
-    pub fn as_timestamped(&self, timestamp: FrcTimestamp) -> FrcTimestampedValue {
-        FrcTimestampedValue::new(timestamp, self.clone())
-    }
-    /// Consumes itself to a tagged value with the given type
-    #[must_use]
-    pub fn to_tagged(self) -> FrcTaggedValue {
-        FrcTaggedValue {
-            r#type: self.get_type(),
-            value: self,
-        }
-    }
     /// Creates a default value based on the type
     ///
     /// Types that will return none:
-    ///     - Void
-    ///     - Struct
+    ///     - `Void`
+    ///     - `Struct`
+    ///     - `StructArray`
     #[must_use]
     pub fn default_value(r#type: FrcType) -> Option<Self> {
         match r#type {
@@ -290,9 +246,9 @@ impl FrcValue {
 impl FrcValue {
     /// Converts the given [``FrcStructure``](crate::structure::FrcStructure) into a [``FrcValue``](FrcValue)
     pub fn from_struct<T: FrcStructure>(value: &T) -> Self {
-        let mut buffer = BytesMut::with_capacity(T::SIZE);
+        let mut buffer = Vec::with_capacity(T::SIZE);
         value.pack(&mut buffer);
-        Self::Struct(&T::DESCRIPTION, Box::new(buffer.freeze()))
+        Self::Struct(Box::new(FrcStructureBytes::from_parts(&T::DESCRIPTION, 1, buffer.into_boxed_slice())))
     }
 
     /// # Errors
@@ -300,9 +256,51 @@ impl FrcValue {
     pub fn try_into_struct<T: FrcStructure>(self) -> Result<T, FrcValueCastError> {
         let frc_type = self.get_type();
         match self {
-            Self::Struct(_, mut buffer) => {
+            Self::Struct(bytes) => {
+                let buffer = bytes.data;
                 if buffer.len() == T::SIZE {
-                    Ok(T::unpack(&mut *buffer))
+                    let mut cursor = Cursor::new(buffer.as_ref());
+                    Ok(T::unpack(&mut cursor))
+                } else {
+                    Err(FrcValueCastError::InvalidCastTo(
+                        frc_type,
+                        T::TYPE,
+                        CastErrorReason::Deserialization,
+                    ))
+                }
+            }
+            _ => Err(FrcValueCastError::InvalidCastTo(
+                frc_type,
+                T::TYPE,
+                CastErrorReason::Type,
+            )),
+        }
+    }
+
+    /// Converts the given [``FrcStructure``](crate::structure::FrcStructure) slice/array into a [``FrcValue``](FrcValue)
+    pub fn from_struct_array<T: FrcStructure>(values: &[T]) -> Self {
+        let mut buffer = Vec::with_capacity(T::SIZE * values.len());
+        for value in values {
+            value.pack(&mut buffer);
+        }
+        Self::StructArray(Box::new(FrcStructureBytes::from_parts(&T::DESCRIPTION, values.len(), buffer.into_boxed_slice()))
+        )
+    }
+
+    /// # Errors
+    /// Returns an error if the value is not a struct or the struct is not the correct type
+    pub fn try_into_struct_array<T: FrcStructure>(self) -> Result<Vec<T>, FrcValueCastError> {
+        let frc_type = self.get_type();
+        match self {
+            Self::StructArray(bytes) => {
+                let buffer = bytes.data;
+                if buffer.len() % T::SIZE == 0 {
+                    let mut cursor = Cursor::new(buffer.as_ref());
+                    let mut values = Vec::with_capacity(buffer.len() / T::SIZE);
+                    while cursor.position() < buffer.len() as u64 {
+                        values.push(T::unpack(&mut cursor));
+                    }
+                    Ok(values)
                 } else {
                     Err(FrcValueCastError::InvalidCastTo(
                         frc_type,
@@ -320,29 +318,13 @@ impl FrcValue {
     }
 }
 
-/// An [``FrcValue``](FrcValue) with a [``FrcType``](FrcType) attached,
-/// best used for serialization and deserialization where keeping the type is important
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash)]
-pub struct FrcTaggedValue {
-    #[serde(rename = "type")]
-    /// The type of the value
-    pub r#type: FrcType,
-    /// The value
-    pub value: FrcValue,
-}
-impl Display for FrcTaggedValue {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}({})", self.r#type, self.value)
-    }
-}
-
 /// An [``FrcValue``](FrcValue) with a [``FrcTimestamp``](FrcTimestamp) attached,
 /// important for passing to logging systems
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, Hash)]
+#[derive(Debug, Clone, PartialEq, Hash)]
 pub struct FrcTimestampedValue {
     /// The timestamp of the value,
     /// typically the uptime of the robot if running on the robot
-    /// and the unix epoch if running on desktop
+    /// and the unix epoch if running on desktop (non sim)
     pub timestamp: FrcTimestamp,
     /// The value
     pub value: FrcValue,

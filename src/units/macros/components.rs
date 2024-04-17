@@ -517,12 +517,14 @@ macro_rules! unit_structure {
             const SIZE: usize = 8;
             const SCHEMA_SUPPLIER: fn() -> String = || String::with_capacity(0);
 
-            fn pack(&self, buffer: &mut impl $crate::structure::bytes::BufMut) {
-                buffer.put_f64_le(self.0);
+            fn pack(&self, buffer: &mut Vec<u8>) {
+                buffer.extend_from_slice(&f64::to_le_bytes(self.0));
             }
 
-            fn unpack(buffer: &mut impl $crate::structure::bytes::Buf) -> Self {
-                Self(buffer.get_f64_le())
+            fn unpack(buffer: &mut std::io::Cursor<&[u8]>) -> Self {
+                let mut value_buffer = [0u8; Self::SIZE];
+                let _ = std::io::Read::read_exact(buffer, &mut value_buffer);
+                Self(f64::from_le_bytes(value_buffer))
             }
         }
     };
@@ -532,12 +534,14 @@ macro_rules! unit_structure {
             const SIZE: usize = 8;
             const SCHEMA_SUPPLIER: fn() -> String = || String::with_capacity(0);
 
-            fn pack(&self, buffer: &mut impl $crate::structure::bytes::BufMut) {
-                buffer.put_i64_le(self.0);
+            fn pack(&self, buffer: &mut Vec<u8>) {
+                buffer.extend_from_slice(&i64::to_le_bytes(self.0));
             }
 
-            fn unpack(buffer: &mut impl $crate::structure::bytes::Buf) -> Self {
-                Self(buffer.get_i64_le())
+            fn unpack(buffer: &mut std::io::Cursor<&[u8]>) -> Self {
+                let mut value_buffer = [0u8; Self::SIZE];
+                let _ = std::io::Read::read_exact(buffer, &mut value_buffer);
+                Self(i64::from_le_bytes(value_buffer))
             }
         }
     };
@@ -547,12 +551,14 @@ macro_rules! unit_structure {
             const SIZE: usize = 8;
             const SCHEMA_SUPPLIER: fn() -> String = || String::with_capacity(0);
 
-            fn pack(&self, buffer: &mut impl $crate::structure::bytes::BufMut) {
-                buffer.put_u64_le(self.0);
+            fn pack(&self, buffer: &mut Vec<u8>) {
+                buffer.extend_from_slice(&u64::to_le_bytes(self.0));
             }
 
-            fn unpack(buffer: &mut impl $crate::structure::bytes::Buf) -> Self {
-                Self(buffer.get_u64_le())
+            fn unpack(buffer: &mut std::io::Cursor<&[u8]>) -> Self {
+                let mut value_buffer = [0u8; Self::SIZE];
+                let _ = std::io::Read::read_exact(buffer, &mut value_buffer);
+                Self(u64::from_le_bytes(value_buffer))
             }
         }
     };

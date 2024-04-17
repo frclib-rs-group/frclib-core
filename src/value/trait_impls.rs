@@ -234,7 +234,7 @@ impl From<Box<[Box<str>]>> for FrcValue {
 }
 impl From<Box<[u8]>> for FrcValue {
     fn from(v: Box<[u8]>) -> Self {
-        Self::Raw(Box::new(Bytes::from(v)))
+        Self::Raw(v)
     }
 }
 impl From<FrcTimestampedValue> for FrcValue {
@@ -887,7 +887,6 @@ impl TryFrom<FrcValue> for Vec<String> {
     }
 }
 
-use bytes::Bytes;
 use rmpv::Value as MPValue;
 
 impl TryFrom<MPValue> for FrcValue {
@@ -900,7 +899,7 @@ impl TryFrom<MPValue> for FrcValue {
             MPValue::F32(f) => Ok(Self::Float(f)),
             MPValue::F64(f) => Ok(Self::Double(f)),
             MPValue::String(s) => Ok(Self::String(s.to_string().into_boxed_str())),
-            MPValue::Binary(b) => Ok(Self::Raw(Box::new(bytes::Bytes::from(b)))),
+            MPValue::Binary(b) => Ok(Self::Raw(b.into_boxed_slice())),
             MPValue::Array(a) => {
                 let mut arr = Vec::with_capacity(a.len());
                 for v in a {
@@ -959,7 +958,6 @@ impl TryFrom<MPValue> for FrcValue {
 impl From<FrcValue> for MPValue {
     fn from(value: FrcValue) -> Self {
         match value {
-            FrcValue::Void => Self::Nil,
             FrcValue::Boolean(b) => Self::Boolean(b),
             FrcValue::Int(i) => Self::Integer(i.into()),
             FrcValue::Float(f) => Self::F32(f),
@@ -984,7 +982,8 @@ impl From<FrcValue> for MPValue {
                     .map(|v| Self::String(v.to_string().into()))
                     .collect::<Vec<Self>>(),
             ),
-            FrcValue::Raw(b) | FrcValue::Struct(_, b) => Self::Binary(b.to_vec()),
+            FrcValue::Raw(b) => Self::Binary(b.to_vec()),
+            _ => Self::Nil, //TODO: implement struct array conversion
         }
     }
 }
@@ -1071,7 +1070,6 @@ impl TryFrom<JSONValue> for FrcValue {
 impl From<FrcValue> for JSONValue {
     fn from(value: FrcValue) -> Self {
         match value {
-            FrcValue::Void => Self::Null,
             FrcValue::Boolean(b) => Self::Bool(b),
             FrcValue::Int(i) => Self::Number({
                 if i < 0 {
@@ -1134,11 +1132,7 @@ impl From<FrcValue> for JSONValue {
                     .map(|v| Self::String(v.to_string()))
                     .collect::<Vec<Self>>(),
             ),
-            FrcValue::Struct(_, b) => Self::Array(
-                b.iter()
-                    .map(|v| Self::Number((u64::from(*v)).into()))
-                    .collect::<Vec<Self>>(),
-            ),
+            _ => Self::Null //TODO: implement struct array conversion
         }
     }
 }
