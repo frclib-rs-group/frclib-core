@@ -1,7 +1,7 @@
 use proc_macro::TokenStream;
 use proc_macro2::{TokenStream as TokenStream2, TokenTree};
 use quote::{quote, ToTokens};
-use syn::{QSelf, Token, Fields, Ident, DeriveInput, Variant, Attribute, MetaList, Meta};
+use syn::{Attribute, DeriveInput, Fields, Ident, Meta, MetaList, QSelf, Token, Variant};
 
 /// Derive macro generating an impl of the trait `FrcStructure`.
 #[proc_macro_derive(FrcStructure)]
@@ -12,17 +12,19 @@ pub fn frc_structure(input: TokenStream) -> TokenStream {
     let attr_tokens = get_frcstructre_attr(&ast.attrs);
 
     match &ast.data {
-        syn::Data::Struct(syn::DataStruct { fields, .. }) => {
-            impl_frc_struct(name, fields).into()
-        }
+        syn::Data::Struct(syn::DataStruct { fields, .. }) => impl_frc_struct(name, fields).into(),
         syn::Data::Enum(syn::DataEnum { variants, .. }) => {
-            let repr = ast.attrs.iter().find_map(|attr| {
-                if attr.path().is_ident("repr") {
-                    attr.parse_args::<Ident>().ok()
-                } else {
-                    None
-                }
-            }).expect("Failed to find repr attribute");
+            let repr = ast
+                .attrs
+                .iter()
+                .find_map(|attr| {
+                    if attr.path().is_ident("repr") {
+                        attr.parse_args::<Ident>().ok()
+                    } else {
+                        None
+                    }
+                })
+                .expect("Failed to find repr attribute");
             let allow_fields = attr_tokens.into_iter().any(|token| {
                 if let TokenTree::Ident(ident) = token {
                     ident == "allow_fields"
@@ -38,17 +40,20 @@ pub fn frc_structure(input: TokenStream) -> TokenStream {
 }
 
 fn get_frcstructre_attr(attr: &[Attribute]) -> TokenStream2 {
-    let frc_attrs: Vec<MetaList> = attr.iter().filter_map(|attr| {
-        if let Meta::List(maybe_frc_attr) = &attr.meta {
-            if maybe_frc_attr.path.is_ident("FrcStructure") {
-                Some(maybe_frc_attr.clone())
+    let frc_attrs: Vec<MetaList> = attr
+        .iter()
+        .filter_map(|attr| {
+            if let Meta::List(maybe_frc_attr) = &attr.meta {
+                if maybe_frc_attr.path.is_ident("FrcStructure") {
+                    Some(maybe_frc_attr.clone())
+                } else {
+                    None
+                }
             } else {
                 None
             }
-        } else {
-            None
-        }
-    }).collect();
+        })
+        .collect();
     let mut out = TokenStream2::new();
     for frc_attr in frc_attrs {
         out.extend(frc_attr.tokens)
@@ -204,8 +209,12 @@ fn impl_frc_struct(name: &Ident, fields: &Fields) -> TokenStream2 {
     }
 }
 
-
-fn impl_frc_enum(name: &Ident, variants: Vec<Variant>, repr: Ident, allow_fields: bool) -> TokenStream2 {
+fn impl_frc_enum(
+    name: &Ident,
+    variants: Vec<Variant>,
+    repr: Ident,
+    allow_fields: bool,
+) -> TokenStream2 {
     let mut enum_variants: Vec<(syn::Ident, syn::LitInt)> = Vec::new();
     let mut last_value = 0;
     for variant in variants {
@@ -236,7 +245,7 @@ fn impl_frc_enum(name: &Ident, variants: Vec<Variant>, repr: Ident, allow_fields
             let span = variant_name.span();
             enum_variants.push((
                 variant_name,
-                syn::LitInt::new(last_value.to_string().as_str(), span)
+                syn::LitInt::new(last_value.to_string().as_str(), span),
             ));
             last_value += 1;
         }
@@ -246,20 +255,14 @@ fn impl_frc_enum(name: &Ident, variants: Vec<Variant>, repr: Ident, allow_fields
         let enum_decl = {
             let mut ss = String::new();
             for enm in enum_variants.clone() {
-                ss.push_str(
-                    &format!(
-                        "{}={}, ",
-                        enm.0,
-                        enm.1
-                    ))
+                ss.push_str(&format!("{}={}, ", enm.0, enm.1))
             }
             ss.truncate(ss.len() - 2);
             ss
         };
         syn::parse_str::<syn::Expr>(&format!(
             "format!(\"enum {{{{{}}}}} {{}} variant\", {}::TYPE)",
-            enum_decl,
-            repr
+            enum_decl, repr
         ))
         .expect("Failed to parse format! call")
     };
@@ -268,22 +271,19 @@ fn impl_frc_enum(name: &Ident, variants: Vec<Variant>, repr: Ident, allow_fields
         let impl_str = {
             let mut match_ = String::new();
             for enm in enum_variants {
-                match_.push_str(
-                    &format!(
-                        "{} => Some({}::{}), ",
-                        enm.1,
-                        name,
-                        enm.0
-                    ))
+                match_.push_str(&format!("{} => Some({}::{}), ", enm.1, name, enm.0))
             }
             match_.push_str("_ => None");
             match_ = format!("match repr {{ {} }}", match_);
-            format!("impl {} {{ fn from_repr(repr: {}) -> Option<{}> {{ {} }} }}", name, repr, name, match_)
+            format!(
+                "impl {} {{ fn from_repr(repr: {}) -> Option<{}> {{ {} }} }}",
+                name, repr, name, match_
+            )
         };
         syn::parse_str::<syn::Item>(impl_str.as_str()).expect("Failed to parse impl")
     };
 
-    quote!{
+    quote! {
         #from_repr
         impl FrcStructure for #name {
             const SIZE: usize = <#repr as FrcStructure>::SIZE;

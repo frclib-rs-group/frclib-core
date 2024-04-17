@@ -42,19 +42,19 @@
 #![allow(missing_docs)]
 
 pub mod angle;
-pub mod angular_velocity;
 pub mod angular_acceleration;
+pub mod angular_velocity;
 pub mod data;
 pub mod data_rate;
-pub mod length;
-pub mod linear_velocity;
-pub mod linear_acceleration;
 pub mod energy;
+pub mod length;
+pub mod linear_acceleration;
+pub mod linear_velocity;
 pub mod mass;
 pub mod moment_of_inertia;
 pub mod temperature;
-pub mod torque;
 pub mod time;
+pub mod torque;
 
 #[doc(hidden)]
 pub mod macros;

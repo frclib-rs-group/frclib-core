@@ -1,6 +1,6 @@
 use std::io::{Cursor, Read};
 
-use num::traits::{ToBytes, FromBytes};
+use num::traits::{FromBytes, ToBytes};
 
 fn empty_schema_supplier() -> String {
     String::with_capacity(0)
@@ -70,7 +70,6 @@ impl super::FrcStructure for char {
         value_buffer[0] as Self
     }
 }
-
 
 impl<T, const N: usize> super::FrcStructure for [T; N]
 where

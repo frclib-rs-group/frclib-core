@@ -119,7 +119,7 @@ where
 
 /// A way of defining any number of same typed [``FrcStructure``]s
 /// in a single binary heap.
-/// 
+///
 /// The type information and struct count is also coupled with the binary data
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FrcStructureBytes {
@@ -137,7 +137,6 @@ impl FrcStructureBytes {
         Self { desc, count, data }
     }
 }
-
 
 /// A set length string of characters
 pub type StructString<const N: usize> = [char; N];

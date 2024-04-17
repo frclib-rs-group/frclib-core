@@ -1132,7 +1132,7 @@ impl From<FrcValue> for JSONValue {
                     .map(|v| Self::String(v.to_string()))
                     .collect::<Vec<Self>>(),
             ),
-            _ => Self::Null //TODO: implement struct array conversion
+            _ => Self::Null, //TODO: implement struct array conversion
         }
     }
 }

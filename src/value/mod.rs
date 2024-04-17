@@ -1,7 +1,9 @@
 //! This module contains the [``FrcValue``](crate::value::FrcValue) type which is used to represent values in various frc protocols.
 
 use std::{
-    fmt::Display, hash::{Hash, Hasher}, io::Cursor
+    fmt::Display,
+    hash::{Hash, Hasher},
+    io::Cursor,
 };
 
 mod error;
@@ -19,7 +21,7 @@ pub use inventory;
 use self::error::CastErrorReason;
 
 /// Measured in microseconds
-/// 
+///
 /// depending on source can be from unix epoch or some arbitrary start time
 pub type FrcTimestamp = u64;
 
@@ -130,7 +132,11 @@ impl Display for FrcValue {
             Self::StringArray(v) => write!(f, "{v:?}"),
             Self::Raw(v) => write!(f, "{v:?}"),
             Self::Struct(bytes) => write!(f, "Struct({}):{:?}", bytes.desc.type_str, bytes.data),
-            Self::StructArray(bytes) => write!(f, "Struct({})[{}]:{:?}", bytes.desc.type_str, bytes.count, bytes.data),
+            Self::StructArray(bytes) => write!(
+                f,
+                "Struct({})[{}]:{:?}",
+                bytes.desc.type_str, bytes.count, bytes.data
+            ),
         }
     }
 }
@@ -149,8 +155,7 @@ impl Hash for FrcValue {
             Self::DoubleArray(v) => v.iter().for_each(|v| v.to_bits().hash(state)),
             Self::StringArray(v) => v.hash(state),
             Self::Raw(v) => v.hash(state),
-            Self::Struct(bytes)
-            | Self::StructArray(bytes) => {
+            Self::Struct(bytes) | Self::StructArray(bytes) => {
                 bytes.desc.schema_supplier.hash(state);
                 bytes.desc.type_str.hash(state);
                 bytes.data.hash(state);
@@ -248,7 +253,11 @@ impl FrcValue {
     pub fn from_struct<T: FrcStructure>(value: &T) -> Self {
         let mut buffer = Vec::with_capacity(T::SIZE);
         value.pack(&mut buffer);
-        Self::Struct(Box::new(FrcStructureBytes::from_parts(&T::DESCRIPTION, 1, buffer.into_boxed_slice())))
+        Self::Struct(Box::new(FrcStructureBytes::from_parts(
+            &T::DESCRIPTION,
+            1,
+            buffer.into_boxed_slice(),
+        )))
     }
 
     /// # Errors
@@ -283,8 +292,11 @@ impl FrcValue {
         for value in values {
             value.pack(&mut buffer);
         }
-        Self::StructArray(Box::new(FrcStructureBytes::from_parts(&T::DESCRIPTION, values.len(), buffer.into_boxed_slice()))
-        )
+        Self::StructArray(Box::new(FrcStructureBytes::from_parts(
+            &T::DESCRIPTION,
+            values.len(),
+            buffer.into_boxed_slice(),
+        )))
     }
 
     /// # Errors

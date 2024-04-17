@@ -13,15 +13,6 @@ macro_rules! complex_type_name {
     };
 }
 
-
-
-
-
-
-
-
-
-
 /// NOT FOR DIRECT USE
 #[doc(hidden)]
 #[macro_export]

@@ -226,13 +226,12 @@ impl std::fmt::Display for HALNotInitializedError {
 }
 impl std::error::Error for HALNotInitializedError {}
 
-
 // #[doc(hidden)]
 // pub mod __private {
 //     pub trait ZST {}
 // }
-// 
-// /// Validates that a driver is zero size 
+//
+// /// Validates that a driver is zero size
 // #[macro_export]
 // macro_rules! assert_driver_zst {
 //     ($driver:ty) => {

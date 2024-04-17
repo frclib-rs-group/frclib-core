@@ -17,7 +17,6 @@ unit_conversion!(Centimeter(float) <-> Inch(float) ~ centimeter_to_inch);
 unit_dim_analysis!(MetersPerSecond * Second = Meter);
 unit_dim_analysis!(FeetPerSecond * Second = Foot);
 
-
 //manually written `unit_family!` because of how plural of imperial units are weird
 #[doc = "A family of units. "]
 #[doc = "The standard unit is `Meter`."]
