@@ -1,9 +1,9 @@
 use crate::{unit, unit_conversion, unit_family};
 
-unit!(DegreePerSecSqr: float);
-unit!(RadianPerSecSqr: float);
-unit!(RotationPerSecSqr: float);
-unit!(RotationPerMinSqr: float);
+unit!(DegreePerSecSqr | DegreesPerSecSqr | DegsPerSecSqr: float);
+unit!(RadianPerSecSqr | RadiansPerSecSqr | RadsPerSecSqr: float);
+unit!(RotationPerSecSqr | RotationsPerSecSqr | RotsPerSecSqr: float);
+unit!(RotationPerMinSqr | RotationsPerMinSqr | RotsPerMinSqr: float);
 
 unit_conversion!(DegreePerSecSqr(float) <-> RadianPerSecSqr(float) ~ degree_per_second_squared_to_radian_per_second_squared);
 unit_conversion!(DegreePerSecSqr(float) <-> RotationPerSecSqr(float) ~ degree_per_second_squared_to_rotation_per_second_squared);

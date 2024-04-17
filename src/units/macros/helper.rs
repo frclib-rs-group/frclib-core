@@ -1,6 +1,30 @@
 /// NOT FOR DIRECT USE
 #[doc(hidden)]
 #[macro_export]
+macro_rules! complex_type_name {
+    ( float ) => {
+        f64
+    };
+    ( int ) => {
+        i64
+    };
+    ( uint ) => {
+        u64
+    };
+}
+
+
+
+
+
+
+
+
+
+
+/// NOT FOR DIRECT USE
+#[doc(hidden)]
+#[macro_export]
 macro_rules! inner_unit_conversion {
     ($unit_a:ident $type_a:ty | $unit_b:ident $type_b:ty : $conv_fn:ident) => {
         #[allow(trivial_numeric_casts)]

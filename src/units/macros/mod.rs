@@ -20,11 +20,19 @@ pub use paste;
 /// ```
 #[macro_export]
 macro_rules! unit {
-    ($unit_name:ident : float) => {
+    ($unit_name:ident $( | $unit_alias:ident)* : float) => {
         /// A unit of measurement.
         /// This is a newtype wrapper around a [`f64`].
         #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
         pub struct $unit_name(pub f64);
+
+        $crate::units::macros::paste::paste! {
+            $(
+                #[doc = "A unit of measurement, this is an alias for [`" $unit_name "`]."]
+                #[doc = "This is a newtype wrapper around a [`f64`]."]
+                pub type $unit_alias = $unit_name;
+            )*
+        }
 
         impl std::hash::Hash for $unit_name {
             fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -135,32 +143,47 @@ macro_rules! unit {
 /// ````
 #[macro_export]
 macro_rules! unit_conversion {
-    ($unit_a:ident ( float ) <-> $unit_b:ident ( float ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a f64 | $unit_b f64 : $conv_fn);
+    ($unit_a:ident ( $unit_a_type:ident ) <-> $unit_b:ident ( $unit_b_type:ident ) ~ $conv_fn:ident ) => {
+        $crate::inner_unit_conversion!(
+            $unit_a $crate::complex_type_name!($unit_a_type)
+            | $unit_b $crate::complex_type_name!($unit_b_type)
+            : $conv_fn
+        );
     };
-    ($unit_a:ident ( int ) <-> $unit_b:ident ( int ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a i64 | $unit_b i64 : $conv_fn);
+    ($unit_a:ident ( $unit_a_type:ident ) <-> $unit_b:ident ( $unit_b_type:ident ) ~ | $c:ident | $conv_ex:expr ) => {
+        $crate::units::macros::paste::paste! {
+            #[doc(hidden)]
+            #[inline]
+            fn [< $unit_a:lower _to_ $unit_b:lower >]
+                (inner_value: $crate::complex_type_name!($unit_a_type))
+                -> $crate::complex_type_name!($unit_b_type)
+            {
+                #[allow(clippy::redundant_closure_call)]
+                (| $c : $crate::complex_type_name!($unit_a_type) | $conv_ex)(inner_value)
+            }
+            $crate::inner_unit_conversion!(
+                $unit_a $crate::complex_type_name!($unit_a_type)
+                | $unit_b $crate::complex_type_name!($unit_b_type)
+                : [< $unit_a:lower _to_ $unit_b:lower >]
+            );
+        }
     };
-    ($unit_a:ident ( uint ) <-> $unit_b:ident ( uint ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a u64 | $unit_b u64 : $conv_fn);
-    };
-    ($unit_a:ident ( float ) <-> $unit_b:ident ( int ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a f64 | $unit_b i64 : $conv_fn);
-    };
-    ($unit_a:ident ( float ) <-> $unit_b:ident ( uint ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a f64 | $unit_b u64 : $conv_fn);
-    };
-    ($unit_a:ident ( int ) <-> $unit_b:ident ( float ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a i64 | $unit_b f64 : $conv_fn);
-    };
-    ($unit_a:ident ( uint ) <-> $unit_b:ident ( float ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a u64 | $unit_b f64 : $conv_fn);
-    };
-    ($unit_a:ident ( int ) <-> $unit_b:ident ( uint ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a i64 | $unit_b u64 : $conv_fn);
-    };
-    ($unit_a:ident ( uint ) <-> $unit_b:ident ( int ) ~ $conv_fn:ident ) => {
-        $crate::inner_unit_conversion!($unit_a u64 | $unit_b i64 : $conv_fn);
+    ($unit_a:ident ( $unit_a_type:ident ) <-> $unit_b:ident ( $unit_b_type:ident ) ~ ratio $conv_ex:expr ) => {
+        $crate::units::macros::paste::paste! {
+            #[doc(hidden)]
+            #[inline]
+            fn [< $unit_a:lower _to_ $unit_b:lower >]
+                (inner_value: $crate::complex_type_name!($unit_a_type))
+                -> $crate::complex_type_name!($unit_b_type)
+            {
+                inner_value * $conv_ex
+            }
+            $crate::inner_unit_conversion!(
+                $unit_a $crate::complex_type_name!($unit_a_type)
+                | $unit_b $crate::complex_type_name!($unit_b_type)
+                : [< $unit_a:lower _to_ $unit_b:lower >]
+            );
+        }
     };
 }
 
