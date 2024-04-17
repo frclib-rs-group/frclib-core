@@ -1,6 +1,6 @@
 [package]
 name = "frclib-core"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 license = "MIT"
 description = "A collection of utilities to be used across the FRC in rust ecosystem"
@@ -26,8 +26,8 @@ nalgebra = { version = "0.32", optional = true}
 num = { version = "0.4", optional = true}
 simba = { version = "0.8", optional = true}
 ctor = { version = "0.2.5", optional = true}
-frclib-structure-macros = { path = "./frclib-structure-macros", optional = true}
-# frclib-structure-macros = { version = "0.1", optional = true}
+# frclib-structure-macros = { path = "./frclib-structure-macros", optional = true}
+frclib-structure-macros = { version = "0.1.2", optional = true}
 paste = { version = "1.0.14", optional = true }
 
 [dev-dependencies]
