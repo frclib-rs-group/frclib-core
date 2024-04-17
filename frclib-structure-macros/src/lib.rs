@@ -186,11 +186,11 @@ fn impl_frc_struct(name: &Ident, fields: &Fields) -> TokenStream2 {
             const TYPE: &'static str = stringify!(#name);
             const SCHEMA_SUPPLIER: fn() -> String = || #schema;
 
-            fn pack(&self, buffer: &mut impl frclib_core::structure::bytes::BufMut) {
+            fn pack(&self, buffer: &mut Vec<u8>) {
                 #pack
             }
 
-            fn unpack(buffer: &mut impl frclib_core::structure::bytes::Buf) -> Self {
+            fn unpack(buffer: &mut Cursor<&[u8]>) -> Self {
                 #unpack
             }
         }
@@ -198,11 +198,16 @@ fn impl_frc_struct(name: &Ident, fields: &Fields) -> TokenStream2 {
         ///This isnt a generic impl for every struct because of primitive and unit types
         impl Into<frclib_core::value::FrcValue> for #name {
             fn into(self) -> frclib_core::value::FrcValue {
-                let mut buffer = frclib_core::structure::bytes::BytesMut::with_capacity(Self::SIZE);
+                let mut buffer = Vec::with_capacity(Self::SIZE);
                 self.pack(&mut buffer);
                 frclib_core::value::FrcValue::Struct(
-                    &Self::DESCRIPTION,
-                    Box::new(buffer.freeze())
+                    Box::new(
+                        FrcStructureBytes::from_parts(
+                            &Self::DESCRIPTION,
+                            1,
+                            buffer.into_boxed_slice()
+                        )
+                    )
                 )
             }
         }
@@ -290,12 +295,12 @@ fn impl_frc_enum(
             const TYPE: &'static str = stringify!(#name);
             const SCHEMA_SUPPLIER: fn() -> String = || #schema;
 
-            fn pack(&self, buffer: &mut impl frclib_core::structure::bytes::BufMut) {
+            fn pack(&self, buffer: &mut Vec<u8>) {
                 let repr = *self as #repr;
                 <#repr as FrcStructure>::pack(&repr, buffer);
             }
 
-            fn unpack(buffer: &mut impl frclib_core::structure::bytes::Buf) -> Self {
+            fn unpack(buffer: &mut Cursor<&[u8]>) -> Self {
                 let repr = <#repr as FrcStructure>::unpack(buffer);
                 Self::from_repr(repr).unwrap_or_default()
             }
@@ -304,11 +309,16 @@ fn impl_frc_enum(
         ///This isnt a generic impl for every struct because of primitive and unit types
         impl Into<frclib_core::value::FrcValue> for #name {
             fn into(self) -> frclib_core::value::FrcValue {
-                let mut buffer = frclib_core::structure::bytes::BytesMut::with_capacity(Self::SIZE);
+                let mut buffer = Vec::with_capacity(Self::SIZE);
                 self.pack(&mut buffer);
                 frclib_core::value::FrcValue::Struct(
-                    &Self::DESCRIPTION,
-                    Box::new(buffer.freeze())
+                    Box::new(
+                        FrcStructureBytes::from_parts(
+                            &Self::DESCRIPTION,
+                            1,
+                            buffer.into_boxed_slice()
+                        )
+                    )
                 )
             }
         }

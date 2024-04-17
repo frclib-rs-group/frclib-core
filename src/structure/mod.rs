@@ -1,8 +1,8 @@
 //! This module contains an implementation of [WPIlib struct spec](https://github.com/wpilibsuite/allwpilib/blob/main/wpiutil/doc/struct.adoc)
 //! for rust and a macro to generate the trait implementation for a given struct.
 
-// #[cfg(test)]
-// mod test;
+#[cfg(test)]
+mod test;
 
 mod prims;
 

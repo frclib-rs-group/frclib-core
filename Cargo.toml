@@ -26,7 +26,8 @@ nalgebra = { version = "0.32", optional = true}
 num = { version = "0.4", optional = true}
 simba = { version = "0.8", optional = true}
 ctor = { version = "0.2.5", optional = true}
-frclib-structure-macros = { version = "0.1", optional = true}
+frclib-structure-macros = { path = "./frclib-structure-macros", optional = true}
+# frclib-structure-macros = { version = "0.1", optional = true}
 paste = { version = "1.0.14", optional = true }
 
 [dev-dependencies]
@@ -54,8 +55,7 @@ features = ["full"]
 
 [workspace]
 members = [
-    "frclib-structure-macros",
-    "frclib-unit-func-macros"
+    "frclib-structure-macros"
 ]
 resolver = "2"
 

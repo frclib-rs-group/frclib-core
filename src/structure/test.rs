@@ -14,7 +14,7 @@ impl FrcStructure for SubStruct {
         self.value.pack(buffer);
     }
 
-    fn unpack(buffer: &[u8]) -> Self {
+    fn unpack(buffer: &mut std::io::Cursor<&[u8]>) -> Self {
         Self {
             value: <f64 as FrcStructure>::unpack(buffer),
         }
@@ -22,6 +22,8 @@ impl FrcStructure for SubStruct {
 }
 
 inventory::submit! { SubStruct::DESCRIPTION }
+
+
 
 #[test]
 #[cfg(feature = "value-union")]

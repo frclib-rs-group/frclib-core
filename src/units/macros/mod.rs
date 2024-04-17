@@ -222,9 +222,11 @@ macro_rules! unit_conversion {
 macro_rules! unit_family {
     ($family_name:ident ( $standard:ident ): $($unit_name:ident),*) => {
         $crate::units::macros::paste::paste! {
-            #[doc = "A family of units. "]
+            #[doc = "A family of units representing an `" $standard "` measurement."]
+            #[doc = ""]
             #[doc = "The standard unit is `" $standard "`."]
-            #[doc = "The other units are `" $($unit_name)"`, `"* "`."]
+            #[doc = ""]
+            #[doc = "The other units are `" $($unit_name)"`, `"* "` and other user-defined units."]
             pub trait $family_name: Into<$standard> + From<$standard> + Copy {
                 #[doc = "Converts this unit to the standard unit of the family."]
                 #[inline]
@@ -232,19 +234,8 @@ macro_rules! unit_family {
                     self.into()
                 }
 
-                $(
-                    #[doc = "Converts this unit to `" $unit_name "`."]
-                    #[inline]
-                    fn [<to_ $unit_name:lower s>](self) -> $unit_name {
-                        $unit_name::from(self.standard())
-                    }
-                )*
-
-                #[doc = "Converts this unit to `" $standard "`."]
-                #[doc = "This is the same as [`standard`](#method.standard)." ]
-                #[inline]
-                fn [<to_ $standard:lower s>](self) -> $standard {
-                    self.standard()
+                fn conv<U: $family_name>(self) -> U {
+                    U::from(self.standard())
                 }
             }
         }
