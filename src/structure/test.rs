@@ -1,4 +1,3 @@
-
 use super::*;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -23,8 +22,6 @@ impl FrcStructure for SubStruct {
 
 inventory::submit! { SubStruct::DESCRIPTION }
 
-
-
 #[test]
 #[cfg(feature = "value-union")]
 fn test_structures() {
@@ -37,7 +34,7 @@ fn test_structures() {
         #[default]
         A,
         B,
-        C = 100
+        C = 100,
     }
 
     #[derive(Debug, PartialEq, Clone, Copy, FrcStructure)]
