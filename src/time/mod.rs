@@ -12,9 +12,9 @@ pub use instant::Instant;
 pub use std::time::{Duration, SystemTime};
 
 /// We don't use the unit as not to depend on the units module when we don't need to
-type Microsecond = u64;
+type U64Microsecond = u64;
 
-static mut UPTIME_SOURCE: fn() -> Microsecond = default::default_uptime_source;
+static mut UPTIME_SOURCE: fn() -> U64Microsecond = default::default_uptime_source;
 static mut UPTIME_PAUSE: fn(bool) = default::default_uptime_pause;
 static mut SYSTEM_TIME_VALID: fn() -> bool = || true;
 static mut IMPLEMENTATION_NAME: &str = default::DEFAULT_IMPL_NAME;
@@ -96,7 +96,7 @@ pub mod __private {
     pub struct TimeImplementation {
         pub implementation_name: &'static str,
         /// A custom monotomic timestamp imlementation
-        pub uptime: fn() -> super::Microsecond,
+        pub uptime: fn() -> super::U64Microsecond,
         /// A custom pause implementation,
         /// this is allowed to panic.
         pub pause: Option<fn(bool) -> ()>,
@@ -115,7 +115,7 @@ pub mod __private {
     pub unsafe fn set_time_implementation(time_imp: TimeImplementation) {
         use std::sync::atomic::Ordering;
         assert!(
-            !super::TIME_IMPL_FROZEN.swap(true, Ordering::Relaxed),
+            !super::TIME_IMPL_FROZEN.swap(true, Ordering::SeqCst),
             "Cannot set time source after it has been used or previously set(old: {}, new: {})",
             super::IMPLEMENTATION_NAME,
             time_imp.implementation_name
@@ -124,10 +124,10 @@ pub mod __private {
         super::IMPLEMENTATION_NAME = time_imp.implementation_name;
         super::SYSTEM_TIME_VALID = time_imp.system_time_valid;
         if let Some(pause) = time_imp.pause {
-            super::PAUSE_IMPLEMENTED.store(true, Ordering::Relaxed);
+            super::PAUSE_IMPLEMENTED.store(true, Ordering::SeqCst);
             super::UPTIME_PAUSE = pause;
         } else {
-            super::PAUSE_IMPLEMENTED.store(false, Ordering::Relaxed);
+            super::PAUSE_IMPLEMENTED.store(false, Ordering::SeqCst);
             super::UPTIME_PAUSE = |_| {};
         }
     }
