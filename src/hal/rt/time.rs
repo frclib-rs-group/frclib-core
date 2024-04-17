@@ -45,7 +45,7 @@ pub trait ClockDriver: 'static {
     /// due to the [`crate::time::pause`] implementation.
     unsafe fn pause(_should_pause: bool) {}
 
-    /// Returns is system time is a valid source of real-world time.
+    /// Returns if system time is a valid source of real-world time.
     /// For platforms like the `RoboRio` this will only be true when connected DS
     /// but platforms like the `Raspberry Pi` or `FRC Sim` will always be true because they have an RTC.
     fn system_time_valid() -> bool;

@@ -33,11 +33,12 @@ pub struct JoystickData {
     /// this can be lossy if the joystick has more than 8 axies.
     pub axies: [f32; 8],
     /// An array of the joystick buttons,
-    /// this can be lossy if the joystick has more than 32 buttons.
-    pub buttons: u32,
+    /// this can be lossy if the joystick has more than 48 buttons.
+    /// This array sub should treated as 8*6 bits where each bit is a button.
+    pub buttons: [u8; 6],
     /// An array of the joystick povs,
-    /// this can be lossy if the joystick has more than 4 povs.
-    pub povs: [i16; 4],
+    /// this can be lossy if the joystick has more than 3 povs.
+    pub povs: [i16; 3],
 }
 
 /// The data for the current station.

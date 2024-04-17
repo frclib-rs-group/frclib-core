@@ -1,4 +1,4 @@
-//! HAL drivers for communication/network peripherals.
+//! HAL drivers for communication/networking with peripherals.
 
 ///
 pub mod can;

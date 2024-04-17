@@ -43,7 +43,7 @@ pub trait HALDriver:
     + WatchdogDriver
     + StationInterfaceDriver
     /*
-    + CanDriver 
+    + CanDriver
     + SpiDriver
     + I2cDriver
     + UartDriver
@@ -57,7 +57,7 @@ pub trait HALDriver:
     fn init();
 
     /// Will only be called once per program execution but is not guaranteed to be called.
-    /// Will always be called after [`init`].
+    /// Will always be called after [`HALDriver::init`].
     /// Can be used to cleanup global state for the driver.
     fn cleanup();
 }
@@ -110,8 +110,8 @@ impl HAL {
     /// Initializes the HAL with support for sim, can only be called once across every HAL.
     ///
     /// # Panics
-    /// If HAL has already been initialized this will panic
-    /// If the used driver is not zero sized this will panic
+    /// If HAL has already been initialized this will panic.
+    /// If the used driver is not zero sized this will panic.
     pub fn init_sim<Driver: SimHALDriver>() {
         assert!(size_of::<Driver>() == 0, "Driver must be zero sized");
         Driver::init();
@@ -225,3 +225,20 @@ impl std::fmt::Display for HALNotInitializedError {
     }
 }
 impl std::error::Error for HALNotInitializedError {}
+
+
+// #[doc(hidden)]
+// pub mod __private {
+//     pub trait ZST {}
+// }
+// 
+// /// Validates that a driver is zero size 
+// #[macro_export]
+// macro_rules! assert_driver_zst {
+//     ($driver:ty) => {
+//         const _: fn() = || {
+//             let _ = core::mem::transmute::<$driver, ()>;
+//         };
+//         impl $crate::hal::__private::ZST for $driver {}
+//     };
+// }
