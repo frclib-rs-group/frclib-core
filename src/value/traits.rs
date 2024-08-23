@@ -17,6 +17,11 @@ impl<T: Into<FrcValue> + Send + Sync> IntoFrcValue for T {
 /// A trait allowing static type checking on some types that implement [``IntoFrcValue``](crate::value::IntoFrcValue).
 #[allow(unused)]
 pub trait StaticallyFrcTyped: IntoFrcValue {
+    /// The type of the value, used for static type checking.
     const TYPE: FrcType;
+    /// Whether the value could be void.
+    /// 
+    /// This may be superseeded by type unions but for now this will be used.
+    /// If this is true think of it as adding and Option<> around the type.
     const COULD_BE_VOID: bool = false;
 }

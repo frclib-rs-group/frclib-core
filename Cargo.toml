@@ -1,6 +1,6 @@
 [package]
 name = "frclib-core"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 license = "MIT"
 description = "A collection of utilities to be used across the FRC in rust ecosystem"
