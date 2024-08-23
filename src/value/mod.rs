@@ -15,6 +15,7 @@ mod traits;
 use crate::structure::{FrcStructure, FrcStructureBytes};
 pub use error::FrcValueCastError;
 pub use traits::IntoFrcValue;
+pub use traits::StaticallyFrcTyped;
 
 pub use inventory;
 
