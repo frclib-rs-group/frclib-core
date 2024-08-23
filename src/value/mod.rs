@@ -12,7 +12,7 @@ mod test;
 mod trait_impls;
 mod traits;
 
-use crate::structure::{FrcStructure, FrcStructureBytes};
+use crate::structure::{FrcStructDesc, FrcStructure, FrcStructureBytes};
 pub use error::FrcValueCastError;
 pub use traits::IntoFrcValue;
 pub use traits::StaticallyFrcTyped;
@@ -41,8 +41,8 @@ pub enum FrcType {
     FloatArray,
     DoubleArray,
     StringArray,
-    Struct,
-    StructArray,
+    Struct(&'static FrcStructDesc),
+    StructArray(&'static FrcStructDesc),
 }
 impl Display for FrcType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -59,8 +59,8 @@ impl Display for FrcType {
             Self::DoubleArray => write!(f, "DoubleArray"),
             Self::StringArray => write!(f, "StringArray"),
             Self::Raw => write!(f, "Raw"),
-            Self::Struct => write!(f, "Struct"),
-            Self::StructArray => write!(f, "StructArray"),
+            Self::Struct(desc) => write!(f, "Struct({})", desc.type_str),
+            Self::StructArray(desc) => write!(f, "StructArray({})", desc.type_str),
         }
     }
 }
@@ -181,8 +181,8 @@ impl FrcValue {
             Self::DoubleArray(_) => FrcType::DoubleArray,
             Self::StringArray(_) => FrcType::StringArray,
             Self::Raw(_) => FrcType::Raw,
-            Self::Struct(_) => FrcType::Struct,
-            Self::StructArray(_) => FrcType::StructArray,
+            Self::Struct(s) => FrcType::Struct(s.desc),
+            Self::StructArray(s) => FrcType::StructArray(s.desc),
         }
     }
     ///Creates an empty Binary

@@ -8,7 +8,7 @@ mod prims;
 
 // use logos::Logos;
 
-use std::io::Cursor;
+use std::{hash::Hash, io::Cursor};
 
 pub use inventory;
 
@@ -22,6 +22,12 @@ pub struct FrcStructDesc {
     pub type_str: &'static str,
     /// The size of the structure in bytes
     pub size: usize,
+}
+
+impl Hash for FrcStructDesc {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.type_str.hash(state);
+    }
 }
 
 inventory::collect!(FrcStructDesc);
@@ -139,7 +145,7 @@ impl FrcStructureBytes {
 }
 
 /// A set length string of characters
-pub type StructString<const N: usize> = [char; N];
+pub type FixedString<const N: usize> = [char; N];
 
 // #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 // pub(crate) enum StructureFieldTypes {

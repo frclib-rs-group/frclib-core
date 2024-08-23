@@ -1,6 +1,6 @@
 [package]
 name = "frclib-core"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 license = "MIT"
 description = "A collection of utilities to be used across the FRC in rust ecosystem"
@@ -34,7 +34,7 @@ paste = { version = "1.0.15", optional = true }
 approx = "0.5.1"
 
 [features]
-structure = ["inventory", "frclib-structure-macros"]
+structure = ["inventory", "frclib-structure-macros", "num"]
 value-union = ["structure", "serde", "rmpv", "serde_json"]
 units = ["num", "nalgebra", "simba", "serde", "paste"]
 time = ["ctor"]
