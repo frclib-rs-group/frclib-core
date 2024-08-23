@@ -1,38 +1,53 @@
 use crate::value::{
     error::{CastErrorReason, FrcValueCastError},
     FrcTimestampedValue, FrcType, FrcValue,
+    traits::StaticallyFrcTyped
 };
+
+macro_rules! static_type {
+    ($type:ty, $variant:ident) => {
+        impl StaticallyFrcTyped for $type {
+            const TYPE: FrcType = FrcType::$variant;
+        }
+    };
+}
 
 impl From<f64> for FrcValue {
     fn from(v: f64) -> Self {
         Self::Double(v)
     }
 }
+static_type!(f64, Double);
 impl From<f32> for FrcValue {
     fn from(v: f32) -> Self {
         Self::Float(v)
     }
 }
+static_type!(f32, Float);
 impl From<i64> for FrcValue {
     fn from(v: i64) -> Self {
         Self::Int(v)
     }
 }
+static_type!(i64, Int);
 impl From<i32> for FrcValue {
     fn from(v: i32) -> Self {
         Self::Int(i64::from(v))
     }
 }
+static_type!(i32, Int);
 impl From<i16> for FrcValue {
     fn from(v: i16) -> Self {
         Self::Int(i64::from(v))
     }
 }
+static_type!(i16, Int);
 impl From<i8> for FrcValue {
     fn from(v: i8) -> Self {
         Self::Int(i64::from(v))
     }
 }
+static_type!(i8, Int);
 impl TryFrom<u64> for FrcValue {
     type Error = FrcValueCastError;
 
@@ -51,86 +66,103 @@ impl From<u32> for FrcValue {
         Self::Int(i64::from(v))
     }
 }
+static_type!(u32, Int);
 impl From<u16> for FrcValue {
     fn from(v: u16) -> Self {
         Self::Int(i64::from(v))
     }
 }
+static_type!(u16, Int);
 impl From<u8> for FrcValue {
     fn from(v: u8) -> Self {
         Self::Int(i64::from(v))
     }
 }
+static_type!(u8, Int);
 impl From<bool> for FrcValue {
     fn from(v: bool) -> Self {
         Self::Boolean(v)
     }
 }
+static_type!(bool, Boolean);
 impl From<String> for FrcValue {
     fn from(v: String) -> Self {
         Self::String(Box::from(v))
     }
 }
+static_type!(String, String);
 impl From<Box<str>> for FrcValue {
     fn from(v: Box<str>) -> Self {
         Self::String(v)
     }
 }
+static_type!(Box<str>, String);
 impl From<&str> for FrcValue {
     fn from(v: &str) -> Self {
         Self::String(Box::from(v))
     }
 }
+static_type!(&str, String);
 impl From<Vec<bool>> for FrcValue {
     fn from(v: Vec<bool>) -> Self {
         Self::BooleanArray(v.into_boxed_slice())
     }
 }
+static_type!(Vec<bool>, BooleanArray);
 impl From<Box<[bool]>> for FrcValue {
     fn from(v: Box<[bool]>) -> Self {
         Self::BooleanArray(v)
     }
 }
+static_type!(Box<[bool]>, BooleanArray);
 impl From<Vec<i64>> for FrcValue {
     fn from(v: Vec<i64>) -> Self {
         Self::IntArray(v.into_boxed_slice())
     }
 }
+static_type!(Vec<i64>, IntArray);
 impl From<Box<[i64]>> for FrcValue {
     fn from(v: Box<[i64]>) -> Self {
         Self::IntArray(v)
     }
 }
+static_type!(Box<[i64]>, IntArray);
 impl From<Vec<i32>> for FrcValue {
     fn from(v: Vec<i32>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Vec<i32>, IntArray);
 impl From<Box<[i32]>> for FrcValue {
     fn from(v: Box<[i32]>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Box<[i32]>, IntArray);
 impl From<Vec<i16>> for FrcValue {
     fn from(v: Vec<i16>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Vec<i16>, IntArray);
 impl From<Box<[i16]>> for FrcValue {
     fn from(v: Box<[i16]>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Box<[i16]>, IntArray);
 impl From<Vec<i8>> for FrcValue {
     fn from(v: Vec<i8>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Vec<i8>, IntArray);
 impl From<Box<[i8]>> for FrcValue {
     fn from(v: Box<[i8]>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Box<[i8]>, IntArray);
 impl TryFrom<Vec<u64>> for FrcValue {
     type Error = FrcValueCastError;
     fn try_from(v: Vec<u64>) -> Result<Self, Self::Error> {
@@ -172,92 +204,119 @@ impl From<Vec<u32>> for FrcValue {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Vec<u32>, IntArray);
 impl From<Box<[u32]>> for FrcValue {
     fn from(v: Box<[u32]>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Box<[u32]>, IntArray);
 impl From<Vec<u16>> for FrcValue {
     fn from(v: Vec<u16>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Vec<u16>, IntArray);
 impl From<Box<[u16]>> for FrcValue {
     fn from(v: Box<[u16]>) -> Self {
         Self::IntArray(v.iter().map(|v| i64::from(*v)).collect())
     }
 }
+static_type!(Box<[u16]>, IntArray);
 impl From<Vec<f32>> for FrcValue {
     fn from(v: Vec<f32>) -> Self {
         Self::FloatArray(v.into_boxed_slice())
     }
 }
+static_type!(Vec<f32>, FloatArray);
 impl From<Box<[f32]>> for FrcValue {
     fn from(v: Box<[f32]>) -> Self {
         Self::FloatArray(v)
     }
 }
+static_type!(Box<[f32]>, FloatArray);
 impl From<Vec<f64>> for FrcValue {
     fn from(v: Vec<f64>) -> Self {
         Self::DoubleArray(v.into_boxed_slice())
     }
 }
+static_type!(Vec<f64>, DoubleArray);
 impl From<Box<[f64]>> for FrcValue {
     fn from(v: Box<[f64]>) -> Self {
         Self::DoubleArray(v)
     }
 }
+static_type!(Box<[f64]>, DoubleArray);
 impl From<Vec<String>> for FrcValue {
     fn from(v: Vec<String>) -> Self {
         Self::StringArray(v.into_iter().map(Box::from).collect())
     }
 }
+static_type!(Vec<String>, StringArray);
 impl From<Vec<&str>> for FrcValue {
     fn from(v: Vec<&str>) -> Self {
         Self::StringArray(v.iter().map(|s| Box::from(*s)).collect())
     }
 }
+static_type!(Vec<&str>, StringArray);
 impl From<Box<[&str]>> for FrcValue {
     fn from(v: Box<[&str]>) -> Self {
         Self::StringArray(v.iter().map(|s| Box::from(*s)).collect())
     }
 }
+static_type!(Box<[&str]>, StringArray);
 impl From<Vec<Box<str>>> for FrcValue {
     fn from(v: Vec<Box<str>>) -> Self {
         Self::StringArray(Box::from(v))
     }
 }
+static_type!(Vec<Box<str>>, StringArray);
 impl From<Box<[Box<str>]>> for FrcValue {
     fn from(v: Box<[Box<str>]>) -> Self {
         Self::StringArray(v)
     }
 }
+static_type!(Box<[Box<str>]>, StringArray);
 impl From<Box<[u8]>> for FrcValue {
     fn from(v: Box<[u8]>) -> Self {
         Self::Raw(v)
     }
 }
+static_type!(Box<[u8]>, Raw);
 impl From<FrcTimestampedValue> for FrcValue {
     fn from(v: FrcTimestampedValue) -> Self {
         v.value
     }
 }
-impl<T: Into<Self>> From<Option<T>> for FrcValue {
+impl<T: IntoFrcValue> From<Option<T>> for FrcValue {
     fn from(v: Option<T>) -> Self {
         match v {
-            Some(v) => v.into(),
+            Some(v) => v.into_frc_value(),
             None => Self::Void,
         }
     }
 }
+impl<T: StaticallyFrcTyped> StaticallyFrcTyped for Option<T> {
+    const TYPE: FrcType = T::TYPE;
+    const COULD_BE_VOID: bool = true;
+}
+
 impl<const N: usize, T> From<[T; N]> for FrcValue
 where
-    Box<[T]>: Into<Self>, //i love rust
+    T: Send + Sync,
+    Box<[T]>: IntoFrcValue
 {
     fn from(v: [T; N]) -> Self {
         let boxed: Box<[T]> = Box::from(v);
-        boxed.into()
+        boxed.into_frc_value()
     }
+}
+impl<const N: usize, T> StaticallyFrcTyped for [T; N]
+where
+    T: Send + Sync,
+    Box<[T]>: StaticallyFrcTyped
+{
+    const TYPE: FrcType = <Box<[T]>>::TYPE;
 }
 
 impl TryFrom<FrcValue> for f64 {
@@ -989,6 +1048,8 @@ impl From<FrcValue> for MPValue {
 }
 
 use serde_json::Value as JSONValue;
+
+use super::IntoFrcValue;
 
 #[allow(clippy::match_wildcard_for_single_variants)]
 impl TryFrom<JSONValue> for FrcValue {
