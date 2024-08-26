@@ -190,7 +190,7 @@ fn impl_frc_struct(name: &Ident, fields: &Fields) -> TokenStream2 {
                 #pack
             }
 
-            fn unpack(buffer: &mut Cursor<&[u8]>) -> Self {
+            fn unpack(buffer: &mut std::io::Cursor<&[u8]>) -> Self {
                 #unpack
             }
         }
@@ -300,7 +300,7 @@ fn impl_frc_enum(
                 <#repr as FrcStructure>::pack(&repr, buffer);
             }
 
-            fn unpack(buffer: &mut Cursor<&[u8]>) -> Self {
+            fn unpack(buffer: &mut std::io::Cursor<&[u8]>) -> Self {
                 let repr = <#repr as FrcStructure>::unpack(buffer);
                 Self::from_repr(repr).unwrap_or_default()
             }
